@@ -1,7 +1,7 @@
 {
-  "name": "Un Cuento, Un Abrazo — ROANSO",
+  "name": "Un Cuento, Un Abrazo",
   "short_name": "CuentoAbrazo",
-  "description": "Narrativa nocturna neuro-inclusiva en español de Chile con modelos compactos abiertos (<=7.6B), modo sueño ámbar sin pantallas azules, audio offline y privacidad infantil Ley 21.719.",
+  "description": "Historias personalizadas para cerrar el día en calma y conversar en familia.",
   "lang": "es-CL",
   "start_url": "/",
   "scope": "/",

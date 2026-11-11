@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#060402" />
-  <title>Un Cuento, Un Abrazo · ROANSO SpA (Human-Scale AI)</title>
+  <title>Un Cuento, Un Abrazo · Historias en familia</title>
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="icon" type="image/svg+xml" href="/pwa/icon.svg" />
   <link rel="stylesheet" href="/pwa/app.css" />
@@ -12,193 +12,251 @@
 <body>
   <header class="topbar" id="mainHeader">
     <div class="brand">
-      <img src="/pwa/icon.svg" alt="ROANSO" class="brand-icon" />
+      <img src="/pwa/icon.svg" alt="Un Cuento, Un Abrazo" class="brand-icon" />
       <div>
-        <h1>Un Cuento, Un Abrazo · ROANSO SpA</h1>
-        <p>SLM Abierto &le;7.6B · Audio Nocturno Verificado (Whisper) · Privacidad Infantil Ley 21.719</p>
+        <h1>Un Cuento, Un Abrazo</h1>
+        <p>Historias personalizadas para cerrar el día en calma y conversar en familia</p>
       </div>
     </div>
 
-    <nav class="mode-nav" aria-label="Modos de uso">
-      <button class="tab-btn active" id="tabShowcase" onclick="RoansoApp.switchMode('showcase')">1. Vitrina Abierta &amp; Audio Real</button>
-      <button class="tab-btn" id="tabBedside" onclick="RoansoApp.enterChildBedsideMode()">2. Modo Niño Ámbar (Cero Chatbots)</button>
-      <button class="tab-btn" id="tabParent" onclick="RoansoApp.switchMode('parent')">3. Portal Adulto (Ley 21.719)</button>
+    <nav class="mode-nav" aria-label="Secciones principales">
+      <button class="tab-btn active" id="tabShowcase" onclick="RoansoApp.switchMode('showcase')">Cuentos de Ejemplo</button>
+      <button class="tab-btn" id="tabBedside" onclick="RoansoApp.enterChildBedsideMode()">Modo Dormir</button>
+      <button class="tab-btn" id="tabParent" onclick="RoansoApp.switchMode('parent')">Espacio Mamá y Papá</button>
     </nav>
 
     <div style="display:flex;gap:8px;align-items:center;">
-      <button class="btn" id="btnAmberToggle" onclick="RoansoApp.toggleAmber()">Modo Luz Ámbar</button>
-      <a class="btn" href="/healthz" target="_blank" rel="noopener">Manifiesto JSON</a>
+      <button class="btn" id="btnAmberToggle" onclick="RoansoApp.toggleAmber()">Luz Cálida de Noche</button>
     </div>
   </header>
 
   <main class="container">
     <div id="globalToast" class="status-banner" role="status"></div>
 
-    <!-- MODO 1: VITRINA PÚBLICA AUDITADA (SIN LOGIN) -->
+    <!-- SECCIÓN 1: CUENTOS Y VALORES COTIDIANOS -->
     <section class="pane active" id="paneShowcase">
       <div class="grid-2col">
         <aside>
           <div class="card">
-            <h2><span>Arquetipos Neuro-Inclusivos (CC-BY-4.0)</span></h2>
+            <h2><span>Valores y Situaciones Cotidianas</span></h2>
+            <p class="section-sub">Elige una historia sobre amistad, límites amables o cómo entender las intenciones de otros.</p>
             <div id="archetypeList"></div>
           </div>
+
           <div class="card">
-            <h2><span>Catálogo Ético de Voces (Apache-2.0)</span></h2>
-            <div id="ethicalVoiceList" style="font-size:0.82rem;color:var(--text-muted);"></div>
+            <h2><span>Narradores</span></h2>
+            <div class="field">
+              <label for="narratorAccentSelect">País y estilo de acento</label>
+              <select id="narratorAccentSelect" onchange="RoansoApp.filterNarratorsByAccent()">
+                <option value="es-CL">Español Chile - Cálido</option>
+                <option value="es-LA">Español Neutro</option>
+                <option value="family">Voz Familiar (Mamá o Papá)</option>
+              </select>
+            </div>
+            <div id="ethicalVoiceList" style="font-size:0.83rem;color:var(--text-muted);"></div>
           </div>
         </aside>
 
         <div>
           <div class="card">
             <div class="badges" id="showcaseBadges"></div>
-            <h3 id="showcaseTitle" style="font-size:1.3rem;margin-bottom:4px;">Cargando vitrina verificada...</h3>
-            <p id="showcaseMeta" style="font-size:0.84rem;color:var(--text-muted);"></p>
+            <h3 id="showcaseTitle" style="font-size:1.38rem;margin-bottom:4px;">Cargando historia...</h3>
+            <p id="showcaseMeta" style="font-size:0.86rem;color:var(--text-muted);"></p>
 
-            <div class="audio-dock">
-              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                <strong id="audioVoiceLabel" style="font-size:0.84rem;">Audio Nocturno Masterizado (-20 LUFS · Room Tone -52 dBFS)</strong>
-                <div style="display:flex;gap:8px;">
-                  <button class="btn" id="btnSaveOffline" onclick="RoansoApp.cacheCurrentShowcaseOffline()">Guardar Offline (Modo Avión)</button>
-                  <button class="btn" onclick="RoansoApp.toggleEinkView()">Vista Lector E-Ink 6&quot;</button>
-                </div>
-              </div>
-              <audio id="showcaseAudio" controls preload="metadata"></audio>
-              <div id="acousticTelemetryBar" style="font-size:0.78rem;color:var(--text-muted);"></div>
+            <!-- Selector visual de 4 Modos de Cuento -->
+            <div class="story-mode-grid" role="tablist" aria-label="Modo de Cuento">
+              <button class="story-mode-card" id="modeCardSleep" onclick="RoansoApp.setStoryMode('solo_escuchar')">
+                <strong>Solo Escuchar (Modo Sueño)</strong>
+                <span>Pantalla apagada, audio suave y apagado automático.</span>
+              </button>
+              <button class="story-mode-card active" id="modeCardReadImagine" onclick="RoansoApp.setStoryMode('leer_imaginar')">
+                <strong>Leer e Imaginar</strong>
+                <span>Media pantalla con texto y media pantalla con ilustración tipo tinta a color.</span>
+              </button>
+              <button class="story-mode-card" id="modeCardParentReads" onclick="RoansoApp.setStoryMode('mama_papa_lee')">
+                <strong>Modo Mamá/Papá Lee</strong>
+                <span>Solo texto cómodo de leer, sin distracciones ni audio, para que el adulto narre a su ritmo.</span>
+              </button>
+              <button class="story-mode-card" id="modeCardIllustratedAudio" onclick="RoansoApp.setStoryMode('ilustraciones_audio')">
+                <strong>Solo Ilustraciones + Audio</strong>
+                <span>Imágenes pausadas mientras avanza el narrador.</span>
+              </button>
             </div>
 
-            <div id="storyStandardView" class="story-box"></div>
-            <div id="storyEinkView" style="display:none;">
-              <div class="eink-frame">
-                <div class="eink-paper">
-                  <div style="font-size:0.74rem;border-bottom:1px solid #bbb;padding-bottom:6px;margin-bottom:12px;display:flex;justify-content:space-between;">
-                    <span>ROANSO E-INK 6&quot; (CERN-OHL-P-2.0)</span>
-                    <span>SIN WI-FI · CERO LUZ AZUL</span>
-                  </div>
-                  <div id="einkTextBody"></div>
+            <!-- Reproductor suave (se oculta automáticamente en Modo Mamá/Papá Lee) -->
+            <div class="audio-dock" id="mainAudioDock">
+              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                <strong id="audioVoiceLabel" style="font-size:0.86rem;">Narración tranquila para la hora de dormir</strong>
+                <button class="btn" id="btnSaveOffline" onclick="RoansoApp.cacheCurrentShowcaseOffline()">Descargar para escuchar sin internet</button>
+              </div>
+              <audio id="showcaseAudio" controls preload="metadata"></audio>
+            </div>
+
+            <!-- Escenario 1: Solo Escuchar (Modo Sueño) -->
+            <div id="stageSoloEscuchar" class="sleep-listen-stage" style="display:none;">
+              <p style="font-size:0.78rem;letter-spacing:0.06em;text-transform:uppercase;opacity:0.85;">Modo Sueño Activo</p>
+              <h4 style="font-size:1.22rem;margin:8px 0 6px;">Pantalla atenuada para descansar</h4>
+              <p style="font-size:0.87rem;opacity:0.85;max-width:440px;margin:0 auto 18px;">Deja el teléfono o tablet a un costado de la cama. La historia se detendrá sola cuando termine.</p>
+              <button class="btn btn-primary" onclick="RoansoApp.enterChildBedsideMode()">Bloquear pantalla completa con PIN de adulto</button>
+            </div>
+
+            <!-- Escenario 2: Leer e Imaginar (50% texto / 50% ilustración tinta a color) -->
+            <div id="stageLeerImaginar" class="split-read-imagine">
+              <div id="storyStandardView" class="story-box"></div>
+              <div class="ink-canvas-card">
+                <div>
+                  <div class="ink-svg-holder" id="inkSplitSvg"></div>
+                  <p id="inkSplitCaption" style="font-size:0.84rem;margin-top:10px;font-weight:600;"></p>
                 </div>
+                <div class="scene-dots" id="inkSplitControls"></div>
+              </div>
+            </div>
+
+            <!-- Escenario 3: Modo Mamá/Papá Lee (solo texto cómodo, cero audio) -->
+            <div id="stageMamaPapaLee" style="display:none;">
+              <div class="parent-reads-sheet">
+                <div style="font-size:0.8rem;opacity:0.7;border-bottom:1px solid rgba(37,33,28,0.15);padding-bottom:8px;margin-bottom:18px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                  <span>Lectura en voz alta de mamá o papá</span>
+                  <span>Sin audio ni interrupciones · A tu propio ritmo</span>
+                </div>
+                <div id="parentReadsBody"></div>
+              </div>
+            </div>
+
+            <!-- Escenario 4: Solo Ilustraciones + Audio -->
+            <div id="stageIlustracionesAudio" style="display:none;">
+              <div class="ink-canvas-card" style="max-width:680px;margin:0 auto;">
+                <div class="ink-svg-holder" id="inkFullSvg"></div>
+                <p id="inkFullCaption" style="font-size:0.92rem;text-align:center;font-weight:600;"></p>
+                <div class="scene-dots" id="inkFullControls" style="justify-content:center;"></div>
               </div>
             </div>
           </div>
 
           <div class="card">
-            <h2><span>Tarjeta Matutina de Conversación Compartida (3 Preguntas — Sin Sermones)</span></h2>
+            <h2><span>Para conversar mañana en el desayuno</span></h2>
+            <p class="section-sub">Tres preguntas sencillas y sin moralejas para conversar dos minutos antes de ir al colegio.</p>
             <div id="parentGuideList"></div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- MODO 2: REPRODUCTOR INFANTIL BLOQUEADO (CERO CHATBOTS / SALIDA CON PIN PARENTAL) -->
+    <!-- SECCIÓN 2: MODO DORMIR PANTALLA COMPLETA (BLOQUEO CON PIN ADULTO) -->
     <section class="pane" id="paneBedside">
       <div class="child-bedside-shell">
-        <p style="font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;opacity:0.8;">Modo Sueño Seguro · Cero Pantallas Interactivas · Cero Chatbots</p>
-        <h2 id="bedsideStoryTitle" style="font-size:1.35rem;margin-top:10px;color:#f4a261;">Hora de descansar</h2>
-        <p id="bedsideSubtitle" style="font-size:0.88rem;opacity:0.85;margin-top:4px;">Deja el dispositivo a un lado y cierra los ojos</p>
+        <p style="font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;opacity:0.8;">Hora de dormir · Pantalla sin distracciones</p>
+        <h2 id="bedsideStoryTitle" style="font-size:1.36rem;margin-top:10px;color:#f4a261;justify-content:center;">Buenas noches</h2>
+        <p id="bedsideSubtitle" style="font-size:0.88rem;opacity:0.85;margin-top:4px;">Cierra los ojos y escucha con calma</p>
 
         <button class="giant-play-btn" id="btnGiantPlay" onclick="RoansoApp.toggleBedsidePlayback()">Escuchar</button>
         <audio id="bedsideAudio" preload="auto"></audio>
 
         <div style="margin-top:14px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
-          <span class="badge accent" id="bedsideOfflineBadge">Audio Verificado</span>
-          <span class="badge accent">Apagado automático al finalizar</span>
+          <span class="badge accent" id="bedsideOfflineBadge">Audio suave</span>
+          <span class="badge accent">Se apaga solo al terminar</span>
         </div>
 
         <div style="margin-top:30px;padding-top:18px;border-top:1px solid rgba(217,119,36,0.22);">
-          <p style="font-size:0.76rem;margin-bottom:8px;">Salida exclusiva para madres, padres o cuidadores:</p>
+          <p style="font-size:0.77rem;margin-bottom:8px;">Salida para mamá, papá o adulto a cargo:</p>
           <div style="display:flex;gap:8px;max-width:290px;margin:0 auto;">
-            <input type="password" id="bedsidePinInput" inputmode="numeric" maxlength="8" placeholder="PIN adulto (o 0000 demo)" />
+            <input type="password" id="bedsidePinInput" inputmode="numeric" maxlength="8" placeholder="PIN adulto (0000 en ejemplo)" />
             <button class="btn" onclick="RoansoApp.exitChildBedsideMode()">Salir</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- MODO 3: PORTAL ADULTO MULTI-TENANT (JWT + BÓVEDA AES-256-GCM + ARCO LEY 21.719) -->
+    <!-- SECCIÓN 3: ESPACIO DE MAMÁ Y PAPÁ -->
     <section class="pane" id="paneParent">
       <div id="authGateSection" class="grid-equal">
         <div class="card">
-          <h2><span>Crear Cuenta Familiar (Ley 21.719 Chile)</span></h2>
-          <div class="field"><label>Nombre de la Familia</label><input id="regFamilyName" placeholder="Ej.: Familia Soto" /></div>
-          <div class="field"><label>Nombre Adulto Responsable</label><input id="regFullName" placeholder="Ej.: Carolina Soto" /></div>
+          <h2><span>Crear Cuenta Familiar</span></h2>
+          <p class="section-sub">Guarda las historias favoritas de tus hijos y prepara cuentos personalizados para cada noche.</p>
+          <div class="field"><label>Nombre de tu Familia</label><input id="regFamilyName" placeholder="Ej.: Familia Soto" /></div>
+          <div class="field"><label>Tu Nombre</label><input id="regFullName" placeholder="Ej.: Carolina Soto" /></div>
           <div class="field"><label>Correo Electrónico</label><input id="regEmail" type="email" placeholder="familia@ejemplo.cl" /></div>
-          <div class="field"><label>Contraseña (mín. 8 caracteres)</label><input id="regPassword" type="password" placeholder="********" /></div>
-          <div class="field"><label>PIN Parental (4 a 8 dígitos para desbloquear Modo Niño)</label><input id="regPin" type="password" inputmode="numeric" maxlength="8" placeholder="4321" /></div>
-          <button class="btn btn-primary" onclick="RoansoApp.registerFamily()">Registrar Cuenta Familiar Segura</button>
+          <div class="field"><label>Contraseña (mínimo 8 caracteres)</label><input id="regPassword" type="password" placeholder="********" /></div>
+          <div class="field"><label>PIN de Adulto (4 a 8 números para salir del Modo Dormir)</label><input id="regPin" type="password" inputmode="numeric" maxlength="8" placeholder="4321" /></div>
+          <button class="btn btn-primary" onclick="RoansoApp.registerFamily()">Crear mi Cuenta Familiar</button>
         </div>
 
         <div class="card">
-          <h2><span>Ingresar a Cuenta Familiar Existente</span></h2>
+          <h2><span>Ya tengo una Cuenta Familiar</span></h2>
+          <p class="section-sub">Ingresa para ver los cuentos guardados y preparar la historia de hoy.</p>
           <div class="field"><label>Correo Electrónico</label><input id="loginEmail" type="email" placeholder="familia@ejemplo.cl" /></div>
           <div class="field"><label>Contraseña</label><input id="loginPassword" type="password" placeholder="********" /></div>
-          <button class="btn btn-primary" onclick="RoansoApp.loginFamily()">Iniciar Sesión</button>
+          <button class="btn btn-primary" onclick="RoansoApp.loginFamily()">Ingresar</button>
         </div>
       </div>
 
       <div id="familyDashboardSection" style="display:none;">
         <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
           <div>
-            <strong id="sessionBadgeText">Sesión Familiar Activa</strong>
-            <p style="font-size:0.78rem;color:var(--text-muted);">Cero diagnósticos médicos almacenados · Aislamiento estricto por familia</p>
+            <strong id="sessionBadgeText">Espacio Familiar Activo</strong>
+            <p style="font-size:0.8rem;color:var(--text-muted);">Tus cuentos y preferencias son privados de tu hogar.</p>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn" onclick="RoansoApp.exportFamilyData()">Exportar Datos JSON (Portabilidad ARCO)</button>
-            <button class="btn btn-danger" onclick="RoansoApp.eraseFamilyAccount()">Eliminar Cuenta y Destruir Datos</button>
-            <button class="btn" onclick="RoansoApp.logout()">Cerrar Sesión</button>
+            <button class="btn" onclick="RoansoApp.exportFamilyData()">Descargar copia de mis cuentos</button>
+            <button class="btn btn-danger" onclick="RoansoApp.eraseFamilyAccount()">Eliminar cuenta familiar</button>
+            <button class="btn" onclick="RoansoApp.logout()">Cerrar sesión</button>
           </div>
         </div>
 
         <div class="grid-equal">
           <div class="card">
-            <h2><span>1. Perfil Sensorial Universal (Sanitizador Ley 21.719 Activo)</span></h2>
-            <div class="field"><label>Apodo del Niño/a (solo primer nombre o apodo)</label><input id="childAlias" placeholder="Ej.: Martín" /></div>
+            <h2><span>Estilo de Lectura de tu Hijo/a</span></h2>
+            <p class="section-sub">Cuéntanos qué tipo de historias disfruta más para que cada noche se sienta cercana y fácil de seguir.</p>
+            <div class="field"><label>Nombre o apodo de tu hijo/a</label><input id="childAlias" placeholder="Ej.: Martín" /></div>
             <div class="field"><label>Edad (3 a 13 años)</label><input id="childAge" type="number" min="3" max="13" value="7" /></div>
             <div class="field">
-              <label>Eje 1 · Claridad de Lenguaje</label>
+              <label>Cómo prefiere las palabras</label>
               <select id="axisLenguaje">
-                <option value="literal_claro">Literal y explícito (frases cortas, modismos explicados)</option>
-                <option value="agil_visual">Ágil y concreto (acción directa)</option>
-                <option value="literario_rico">Literario y cálido (metáforas suaves)</option>
+                <option value="literal_claro">Claro y directo (historias fáciles de seguir, paso a paso)</option>
+                <option value="agil_visual">Ágil y entretenido (acción sencilla desde el comienzo)</option>
+                <option value="literario_rico">Imaginativo y descriptivo (paisajes y detalles cálidos)</option>
               </select>
             </div>
             <div class="field">
-              <label>Eje 2 · Estructura Nocturna</label>
+              <label>Cómo prefiere el orden de cada noche</label>
               <select id="axisEstructura">
-                <option value="ritual_anticipado">Ritual predecible con anticipación</option>
-                <option value="enganche_rampa_calma">Enganche rápido + Rampa de sueño</option>
-                <option value="serie_multiverso">Serie episódica del Multiverso</option>
+                <option value="ritual_anticipado">Rutina tranquila (misma estructura cada noche)</option>
+                <option value="enganche_rampa_calma">Inicio entretenido y final cada vez más suave</option>
+                <option value="serie_multiverso">Capítulos conectados como una colección</option>
               </select>
             </div>
             <div class="field">
-              <label>Eje 3 · Estímulo Sonoro</label>
+              <label>Ritmo de la narración</label>
               <select id="axisSonoro">
-                <option value="monovoz_estable">Monovoz pareja y serena (0.90x estable)</option>
-                <option value="dinamico_a_calmo">Sleep Ramp (expresivo al inicio, susurro al cierre)</option>
+                <option value="monovoz_estable">Lectura pausada y suave</option>
+                <option value="dinamico_a_calmo">Expresiva al comienzo y muy bajita al dormir</option>
               </select>
             </div>
-            <div class="field"><label>Intereses Especiales (separados por coma)</label><input id="childInterests" placeholder="trenes eléctricos, mapas del sur" /></div>
-            <div class="field"><label>Frase Familiar de Cierre</label><input id="childClosing" value="en casa te queremos mucho" /></div>
-            <div class="field"><label>Notas Libres (términos clínicos son omitidos automáticamente antes de guardar)</label><input id="childNotes" placeholder="Evitar globos que revientan y sirenas" /></div>
-            <button class="btn btn-primary" onclick="RoansoApp.createChild()">Guardar Perfil Sensorial</button>
+            <div class="field"><label>Temas, juegos o animales favoritos (separados por coma)</label><input id="childInterests" placeholder="trenes de madera, mapas del sur, perritos" /></div>
+            <div class="field"><label>Frase cariñosa para cerrar cada cuento</label><input id="childClosing" value="en casa te queremos mucho" /></div>
+            <div class="field"><label>Cosas que prefieres evitar en sus cuentos (opcional)</label><input id="childNotes" placeholder="Ej.: evitar tormentas fuertes o globos que revientan" /></div>
+            <button class="btn btn-primary" onclick="RoansoApp.createChild()">Guardar Estilo de Lectura</button>
             <div id="childrenList" style="margin-top:14px;"></div>
           </div>
 
           <div>
             <div class="card">
-              <h2><span>2. Encolar Cuento de Esta Noche (Worker GPU Elástico)</span></h2>
-              <div class="field"><label>Seleccionar Perfil</label><select id="jobChildSelect"></select></div>
-              <div class="field"><label>Seleccionar Voz (Catálogo Ético o Bóveda Parental)</label><select id="jobVoiceSelect"></select></div>
-              <div class="field"><label>Semilla Cotidiana del Día (observada por mamá/papá)</label><textarea id="jobSeed" rows="3" placeholder="Hoy compartieron turnos jugando con barquitos de papel en la tarde..."></textarea></div>
-              <button class="btn btn-primary" onclick="RoansoApp.enqueueJob()">Enviar a Cola de Producción Nocturna</button>
-              <div id="activeJobBox" style="margin-top:12px;font-size:0.82rem;color:var(--text-muted);"></div>
+              <h2><span>Preparar el cuento de esta noche</span></h2>
+              <p class="section-sub">Escribe una situación simple del día (un juego con amigos, un límite o algo nuevo) para transformarla en la historia de hoy.</p>
+              <div class="field"><label>¿Para quién es el cuento?</label><select id="jobChildSelect"></select></div>
+              <div class="field"><label>Narrador</label><select id="jobVoiceSelect"></select></div>
+              <div class="field"><label>¿Qué pasó o conversaron hoy?</label><textarea id="jobSeed" rows="3" placeholder="Hoy jugaron con barquitos de papel y practicaron turnarse sin enojarse..."></textarea></div>
+              <button class="btn btn-primary" onclick="RoansoApp.enqueueJob()">Preparar el cuento de esta noche</button>
+              <div id="activeJobBox" style="margin-top:12px;font-size:0.83rem;color:var(--text-muted);"></div>
               <div id="familyChaptersBox" style="margin-top:12px;"></div>
             </div>
 
             <div class="card">
-              <h2><span>3. Bóveda Vocal Adulta AES-256-GCM (Revocación en 1 Clic)</span></h2>
-              <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:10px;">Prohibido clonar voces de menores. El timbre adulto se cifra con HKDF por familia y se destruye criptográficamente al revocar.</p>
-              <div class="field"><label>Etiqueta de Voz Adulta (>18 años)</label><input id="voiceDisplayName" placeholder="Ej.: Voz Mamá / Voz Papá" value="Voz Adulta Cifrada (Demo)" /></div>
-              <div class="field"><label>Declaración Hablada de Consentimiento Biométrico</label><input id="voiceConsentText" value="Yo adulto responsable autorizo expresamente a ROANSO a cifrar mi voz únicamente para los cuentos nocturnos de mi familia." /></div>
-              <button class="btn" style="margin-bottom:12px;" onclick="RoansoApp.enrollAdultVoice()">Cifrar y Guardar Voz Adulta (AES-256-GCM)</button>
+              <h2><span>Voz de Mamá o Papá (Privada y Segura)</span></h2>
+              <p style="font-size:0.81rem;color:var(--text-muted);margin-bottom:12px;">Solo para voces adultas. Puedes borrar tu voz con un clic cuando quieras.</p>
+              <div class="field"><label>Nombre para identificar tu voz</label><input id="voiceDisplayName" placeholder="Ej.: Voz de Mamá / Voz de Papá" value="Voz de Mamá" /></div>
+              <div class="field"><label>Confirmación de voz adulta</label><input id="voiceConsentText" value="Yo adulto responsable autorizo expresamente a ROANSO a guardar mi voz únicamente para los cuentos privados de mi familia." /></div>
+              <button class="btn" style="margin-bottom:12px;" onclick="RoansoApp.enrollAdultVoice()">Guardar mi voz adulta</button>
               <div id="familyVoicesBox"></div>
             </div>
           </div>
@@ -206,6 +264,29 @@
       </div>
     </section>
   </main>
+
+  <footer class="site-footer" id="mainFooter">
+    <span>Un Cuento, Un Abrazo · Hecho en Chile para acompañar a las familias</span>
+    <button class="footer-link" onclick="RoansoApp.openPrivacyModal()">Privacidad y Seguridad Infantil</button>
+  </footer>
+
+  <!-- Modal discreto de Privacidad y Seguridad Infantil -->
+  <div class="modal-backdrop" id="privacyModal" role="dialog" aria-modal="true" aria-labelledby="privacyModalTitle">
+    <div class="modal-sheet">
+      <h3 id="privacyModalTitle">Privacidad y Seguridad Infantil</h3>
+      <p>Diseñamos <strong>Un Cuento, Un Abrazo</strong> para proteger la tranquilidad de tu hogar y los datos de tus hijos bajo la normativa chilena de protección de datos personales (<strong>Ley 21.719</strong>):</p>
+      <ul>
+        <li><strong>Sin etiquetas ni fichas de salud:</strong> Nunca solicitamos ni almacenamos información médica de tus hijos; solo guardamos sus gustos cotidianos y su estilo favorito de lectura.</li>
+        <li><strong>Cero Chatbots frente a los niños:</strong> Los niños jamás conversan con una pantalla abierta ni reciben publicidad. La aplicación está pensada para escuchar en calma o leer junto a mamá y papá.</li>
+        <li><strong>Control familiar en un clic:</strong> Las voces adultas son privadas de cada hogar y pueden borrarse de inmediato cuando lo decidas, al igual que toda tu cuenta familiar.</li>
+        <li><strong>Obras abiertas y respeto autoral:</strong> Nuestras referencias literarias y voces propias cuentan con licencias abiertas y acuerdos transparentes de uso familiar.</li>
+      </ul>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:10px;">
+        <a href="/healthz" target="_blank" rel="noopener" style="font-size:0.76rem;color:var(--text-muted);">Ficha de verificación institucional</a>
+        <button class="btn btn-primary" onclick="RoansoApp.closePrivacyModal()">Entendido</button>
+      </div>
+    </div>
+  </div>
 
   <script src="/pwa/app.js"></script>
 </body>

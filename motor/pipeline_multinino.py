@@ -491,23 +491,26 @@ def generar_guia_padres(texto: str, biblia: Dict[str, Any], titulo: str = "") ->
     compa = mascotas[0].get("nombre") if mascotas else "los amigos del cuento"
 
     return {
-        "fundamento": "Conversación compartida opcional de 2 minutos al desayuno (práctica con mayor respaldo en comprensión narrativa e inferencia socioemocional).",
+        "fundamento": "Para conversar mañana en el desayuno (2 minutos en familia, sin tono moralista).",
         "valor_del_capitulo": valor_foco,
         "preguntas": [
             {
-                "tipo": "1. Recuerdo seguro (concreta)",
-                "pregunta": f"¿Qué parte del cuento '{titulo or 'de anoche'}' con {compa} te gustó más imaginar?"
+                "tipo": "1. Emoción en el momento",
+                "pregunta": f"¿Qué sintió {apodo} cuando ocurrió el momento principal del cuento de anoche?",
+                "pista_apoyo": "Escuchar con calma qué emoción notó y qué la provocó en la historia."
             },
             {
-                "tipo": "2. Emoción con causa (perspectiva)",
-                "pregunta": "¿Por qué crees que los personajes se sintieron más tranquilos cuando se escucharon con calma?"
+                "tipo": "2. Leer las intenciones",
+                "pregunta": "¿Cómo nos dimos cuenta de las verdaderas intenciones de los demás personajes?",
+                "pista_apoyo": "Fijarse en sus gestos y palabras para distinguir un descuido o entusiasmo de una mala intención."
             },
             {
-                "tipo": "3. Puente cariñoso al día de hoy",
-                "pregunta": f"Si hoy nos pasa algo parecido a lo del cuento, ¿qué idea chiquitita podríamos probar juntos, {apodo}?"
+                "tipo": "3. En el colegio con amigos",
+                "pregunta": "¿Qué harías tú si un amigo hace eso en el colegio?",
+                "pista_apoyo": "Imaginar juntos una respuesta tranquila para poner límites amables o ponerse de acuerdo."
             }
         ],
-        "escalera_apoyo": "Sin presión: si no tiene ganas de responder, comenta tú primero tu parte favorita en una frase corta y déjalo abierto."
+        "escalera_apoyo": "Sin presión: si prefiere solo escuchar, comparte tú primero qué parte te gustó en una frase breve."
     }
 
 

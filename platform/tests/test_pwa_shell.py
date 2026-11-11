@@ -43,6 +43,70 @@ def test_01_pwa_shell_manifest_and_service_worker(platform_env) -> None:
     assert client.get("/pwa/nonexistent.js").status_code == 404
 
 
+def test_03_consumer_universal_design_zero_jargon_and_four_modes(platform_env) -> None:
+    _settings, _app, client, _storage_dir = platform_env
+    html = client.get("/").text
+
+    # Regla 1: Diseño Universal invisible (cero etiquetas clínicas o de neurodivergencia en UI)
+    forbidden_clinical_ui = [
+        "Neuro-Inclusivo",
+        "Neuro-Inclusivos",
+        "TEA",
+        "TDAH",
+        "diagnósticos",
+        "diagnóstico",
+        "Perfil Sensorial",
+        "clínico",
+        "clínicos",
+    ]
+    for term in forbidden_clinical_ui:
+        assert term not in html, f"Etiqueta clínica no permitida en UI familiar: {term}"
+
+    # Regla 2: Cero jerga técnica en header, botones y tarjetas
+    forbidden_jargon_ui = [
+        "SLM Abierto",
+        "7.6B",
+        "Whisper",
+        "-20 LUFS",
+        "-52 dBFS",
+        "CERN-OHL",
+        "CC-BY-4.0",
+        "Apache-2.0",
+        "Worker GPU",
+        "AES-256-GCM",
+        "HKDF",
+        "Sanitizador",
+        "Manifiesto JSON",
+    ]
+    for jargon in forbidden_jargon_ui:
+        assert jargon not in html, f"Jerga técnica no permitida en UI familiar: {jargon}"
+
+    # Textos cálidos y jerarquía visual obligatoria (Reglas 1, 2, 3 y 4)
+    required_consumer_labels = [
+        "Historias personalizadas para cerrar el día en calma y conversar en familia",
+        "Valores y Situaciones Cotidianas",
+        "Narradores",
+        "Español Chile - Cálido",
+        "Español Neutro",
+        "Voz Familiar",
+        "Solo Escuchar (Modo Sueño)",
+        "Leer e Imaginar",
+        "Modo Mamá/Papá Lee",
+        "Solo Ilustraciones + Audio",
+        "Para conversar mañana en el desayuno",
+        "Estilo de Lectura de tu Hijo/a",
+        "Claro y directo (historias fáciles de seguir, paso a paso)",
+        "Rutina tranquila (misma estructura cada noche)",
+        "Lectura pausada y suave",
+        "Preparar el cuento de esta noche",
+        "Voz de Mamá o Papá (Privada y Segura)",
+        "Solo para voces adultas. Puedes borrar tu voz con un clic cuando quieras.",
+        "Privacidad y Seguridad Infantil",
+    ]
+    for label in required_consumer_labels:
+        assert label in html, f"Falta etiqueta de Diseño Universal familiar: {label}"
+
+
 def test_02_list_child_chapters_and_query_token_audio_streaming(platform_env) -> None:
     settings, _app, client, _storage_dir = platform_env
 

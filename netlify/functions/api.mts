@@ -183,24 +183,24 @@ function computeSpanishReadability(text: string): {
   return { wordCount: words.length, szigriszt, fernandezHuerta };
 }
 
-function buildMorningParentGuide(alias: string, closingPhrase: string) {
+function buildMorningParentGuide(alias: string, _closingPhrase: string) {
   return {
-    nota_uso: "3 preguntas breves para conversar juntos a la mañana siguiente, sin moralejas ni interrogatorios.",
+    nota_uso: "Para conversar mañana en el desayuno (2 minutos en familia, sin tono moralista).",
     preguntas: [
       {
-        tipo: "Recuerdo sensorial",
-        pregunta: `¿Qué sonido o lugar tranquilo del cuento de anoche le gustó más a ${alias}?`,
-        pista_apoyo: "Aceptar respuestas cortas o señalar un objeto cotidiano.",
+        tipo: "1. Emoción en el momento",
+        pregunta: `¿Qué sintió ${alias} cuando ocurrió el momento principal del cuento de anoche?`,
+        pista_apoyo: "Escuchar con calma qué emoción notó y qué la provocó en la historia.",
       },
       {
-        tipo: "Puente cotidiano",
-        pregunta: "¿Qué parte tranquila del día de hoy se pareció un poquito a la historia?",
-        pista_apoyo: "Conectar con un momento concreto sin juzgar conductas.",
+        tipo: "2. Leer las intenciones",
+        pregunta: "¿Cómo nos dimos cuenta de las verdaderas intenciones de los demás personajes?",
+        pista_apoyo: "Fijarse en sus gestos y palabras para distinguir entusiasmo o descuido de una mala intención.",
       },
       {
-        tipo: "Vínculo afectivo",
-        pregunta: `¿Dónde te gustaría escuchar hoy nuestra frase "${closingPhrase}"?`,
-        pista_apoyo: "Reforzar seguridad y anticipación del ritual familiar.",
+        tipo: "3. En el colegio con amigos",
+        pregunta: "¿Qué harías tú si un amigo hace eso en el colegio?",
+        pista_apoyo: "Imaginar juntos una respuesta tranquila para poner límites amables o ponerse de acuerdo.",
       },
     ],
   };

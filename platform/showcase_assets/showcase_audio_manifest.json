@@ -96,23 +96,26 @@
         "block_repairs_triggered": 0
       },
       "parent_guide": {
-        "fundamento": "Conversación compartida opcional de 2 minutos al desayuno (práctica con mayor respaldo en comprensión narrativa e inferencia socioemocional).",
-        "valor_del_capitulo": "entender que dos amigos pueden jugar distinto y ponerse de acuerdo",
+        "fundamento": "Para conversar mañana en el desayuno (2 minutos en familia, sin sermones).",
+        "valor_del_capitulo": "Amistad, poner límites con calma y entender intenciones",
         "preguntas": [
           {
-            "tipo": "1. Recuerdo seguro (concreta)",
-            "pregunta": "¿Qué parte del cuento 'La Estación Tranquila de los Trenes de Lucas' con Canela te gustó más imaginar?"
+            "tipo": "1. Emoción en el momento",
+            "pregunta": "¿Qué sintió Lucas cuando Tomás quiso mover las dos palancas de bronce al mismo tiempo?",
+            "pista_apoyo": "Notar cómo el cuerpo avisa (hombros apretados por el ruido fuerte) antes de hablar con calma."
           },
           {
-            "tipo": "2. Emoción con causa (perspectiva)",
-            "pregunta": "¿Por qué crees que los personajes se sintieron más tranquilos cuando se escucharon con calma?"
+            "tipo": "2. Leer las intenciones",
+            "pregunta": "¿Cómo nos dimos cuenta de las verdaderas intenciones de Tomás cuando hablaba tan rápido?",
+            "pista_apoyo": "Descubrir que no quería molestar: solo estaba muy entusiasmado por encender la luz verde."
           },
           {
-            "tipo": "3. Puente cariñoso al día de hoy",
-            "pregunta": "Si hoy nos pasa algo parecido a lo del cuento, ¿qué idea chiquitita podríamos probar juntos, Lucas?"
+            "tipo": "3. En el colegio con amigos",
+            "pregunta": "¿Qué harías tú si un amigo hace eso en el colegio y juega muy fuerte sin darse cuenta?",
+            "pista_apoyo": "Conversar ideas simples para pedir una pausa o proponer turnos donde los dos estén cómodos."
           }
         ],
-        "escalera_apoyo": "Sin presión: si no tiene ganas de responder, comenta tú primero tu parte favorita en una frase corta y déjalo abierto."
+        "escalera_apoyo": "Conversación libre: si tu hijo prefiere solo escuchar, cuéntale tú primero qué parte te gustó."
       },
       "story_text": "Buenas noches, Lucas. Esta noche escucharemos un cuento tranquilo en la estación de Quillay Alto. Primero te cuento lo que va a pasar hoy para que no haya ninguna sorpresa. Lucas revisará el tablero de los trenes con la Canela. Después conversará con su amigo Tomás para ordenar el turno de las palancas. Al final dejará el tren azul durmiendo en su cochera tibia. En la estación de Quillay Alto ya encendieron los tres faroles de luz ámbar. Lucas lleva puesta su gorra azul de jefe de horarios. Camina despacio por el andén de piedra con su linterna tibia. A su lado va la Canela, moviendo la cola sin hacer ruido sobre las tablas. A Lucas le gusta mucho el tablero de madera. En ese tablero cada tren tiene su hora exacta y su cartel del mismo color. El tren número cuatro es el tren azul de los correos. Ese tren siempre llega a las ocho con diez minutos con las cartas de los cerros. Esta tarde vino de visita su amigo Tomás. Tomás vive cerca de la panadería La Espiga y también quería ayudar en la estación. Tomás hablaba rápido porque estaba muy entusiasmado mirando las vías. Quiso mover dos palancas de bronce al mismo tiempo para probar las luces. Lucas sintió los hombros apretados porque dos palancas juntas hacen un clic metálico muy fuerte. Además, si se mueven juntas se confunde el camino del andén. En vez de enojarse o quedarse callado, Lucas levantó una mano con calma. Le explicó a Tomás que ese ruido fuerte le molestaba en los oídos. Tomás soltó las palancas y escuchó con atención. Lo entendió al tiro, eso quiere decir que lo comprendió de inmediato y con cariño. Tomás contó que él hablaba fuerte solo porque tenía muchas ganas de encender el semáforo verde. Entonces los dos amigos buscaron un acuerdo claro donde ambos estuvieran cómodos. Acordaron dos pasos muy simples para trabajar en equipo. Primero Lucas revisaría en silencio la aguja del riel con su libreta cuadriculada. Después Lucas haría una seña suave con su linterna amarilla. Con esa seña, Tomás bajaría una sola palanca despacito hasta prender la luz verde. Lo probaron juntos y resultó muy bien. La palanca sonó bajito como una cuchara de madera y la luz verde brilló pareja. Don Anselmo pasó caminando con su maletín de cuero rumbo al puente colgante. Los saludó con el sombrero y felicitó el sistema tan claro que habían armado. Justo a las ocho con diez minutos apareció el tren azul por la curva del valle. Avanzó despacio sobre los rieles limpios, sin pitos ni ruidos bruscos. Solo se escuchaba el murmullo parejo y suave de sus ruedas tibias. El maquinista dejó el saco de cartas sobre el banco de pino. Lucas revisó las cuatro etiquetas de cartón y marcó un visto bueno suave con su lápiz grafito. Cada paquete tenía su número claro y su casillero listo para el reparto de la mañana. Luego el maquinista guardó el tren azul dentro de la cochera techada para que descansara hasta mañana. Tomás se despidió contento desde el sendero de tierra. Avisó con calma que en la próxima visita traerá pancito tibio para mirar un mapa nuevo. Adentro de la caseta, Lucas colgó su gorra azul en el gancho número uno. Cerró su libreta cuadriculada y la dejó derecha sobre la mesa ordenada. La Canela dio dos vueltas lentas sobre su alfombra color miel. Quedó echada y tranquila junto a la estufa apagada que todavía guardaba calorcito. Afuera los tres faroles ámbar bajaron su luz a la mitad. Todo lo anunciado para hoy quedó listo y en su lugar exacto. El tablero está en orden, la vía está silenciosa y el tren azul duerme bajo techo hasta mañana al despertar. Ahora tus hombros pueden soltarse blanditos sobre la cama tibia. Respira lento y parejo igual que la Canela en su alfombra, y descansa tranquilo, que aquí te cuidamos.",
       "synthesis_elapsed_seconds": 73.92
@@ -161,23 +164,26 @@
         "block_repairs_triggered": 0
       },
       "parent_guide": {
-        "fundamento": "Conversación compartida opcional de 2 minutos al desayuno (práctica con mayor respaldo en comprensión narrativa e inferencia socioemocional).",
-        "valor_del_capitulo": "compartir turnos sin enojarse",
+        "fundamento": "Para conversar mañana en el desayuno (2 minutos en familia, sin sermones).",
+        "valor_del_capitulo": "Esperar turnos, reparar roces pequeños y empatía",
         "preguntas": [
           {
-            "tipo": "1. Recuerdo seguro (concreta)",
-            "pregunta": "¿Qué parte del cuento 'El Faro de los Inventos de Mateo' con Luna te gustó más imaginar?"
+            "tipo": "1. Emoción en el momento",
+            "pregunta": "¿Qué sintió Mateo cuando recordó que él y su amigo tiraron la manivela al mismo tiempo?",
+            "pista_apoyo": "Reconocer con naturalidad qué sentimos cuando nos apuramos demasiado en un juego."
           },
           {
-            "tipo": "2. Emoción con causa (perspectiva)",
-            "pregunta": "¿Por qué crees que los personajes se sintieron más tranquilos cuando se escucharon con calma?"
+            "tipo": "2. Leer las intenciones",
+            "pregunta": "¿Cómo nos dimos cuenta de sus verdaderas intenciones al querer girar el mecanismo juntos?",
+            "pista_apoyo": "Ver que ninguno quería pelear: ambos tenían muchas ganas de ver funcionar el invento."
           },
           {
-            "tipo": "3. Puente cariñoso al día de hoy",
-            "pregunta": "Si hoy nos pasa algo parecido a lo del cuento, ¿qué idea chiquitita podríamos probar juntos, Mateo?"
+            "tipo": "3. En el colegio con amigos",
+            "pregunta": "¿Qué harías tú si un amigo hace eso en el colegio y los dos quieren usar lo mismo a la vez?",
+            "pista_apoyo": "Pensar acuerdos prácticos como contar hasta diez o turnarse una vuelta cada uno."
           }
         ],
-        "escalera_apoyo": "Sin presión: si no tiene ganas de responder, comenta tú primero tu parte favorita en una frase corta y déjalo abierto."
+        "escalera_apoyo": "Conversación libre: si tu hijo prefiere solo escuchar, cuéntale tú primero qué parte te gustó."
       },
       "story_text": "Mateo giró el reloj de arena dorada del Faro de los Inventos y vio caer el primer destello brillante sobre su mesa. A su lado, la Luna saltó ágil con su pelaje barcino para mirar los engranajes de madera que empezaban a moverse. Hoy tenían una misión rápida antes de dormir: alinear el gran telescopio de bronce con los barquitos de papel luminoso del río. Durante la tarde, jugando en el patio con un amigo, los dos habían querido girar la manivela al mismo tiempo y habían tenido un roce chico. Mateo sintió la cara tibia al recordarlo porque él había tirado primero del mango sin esperar su turno. Entonces recordó lo liviano que se siente el pecho cuando uno pide disculpas con cariño y propone contar hasta diez para turnarse. Con dedos seguros, Mateo ajustó la rueda mediana del telescopio y esperó tranquilo a que la arena dorada terminara de bajar. Por el lente apareció el valle silencioso iluminado por estrellitas lentas que flotaban sobre el agua calma. Los barquitos de papel doblaron la curva suave del estero y bajaron sus velas blancas para descansar junto al muelle. Cada movimiento en el faro se fue haciendo más pausado y tibio. Mateo guardó sus engranajes de madera uno por uno dentro de la caja de cedro. La Luna se subió al sillón de terciopelo, apoyó la cabeza en sus patitas y empezó a ronronear suavecito como un motor chiquitito. El murmullo lento del río subía por la ventana e invitaba a bostezar profundo. Mateo apagó su linterna ámbar y se tapó hasta los hombros pensando en los juegos nuevos que armará mañana al despertar, seguro y contento porque en casa te queremos mucho.",
       "synthesis_elapsed_seconds": 78.3
@@ -226,23 +232,26 @@
         "block_repairs_triggered": 0
       },
       "parent_guide": {
-        "fundamento": "Conversación compartida opcional de 2 minutos al desayuno (práctica con mayor respaldo en comprensión narrativa e inferencia socioemocional).",
-        "valor_del_capitulo": "Pedir ayuda a la comunidad con confianza",
+        "fundamento": "Para conversar mañana en el desayuno (2 minutos en familia, sin sermones).",
+        "valor_del_capitulo": "Pedir ayuda con confianza, gratitud y trabajo en equipo",
         "preguntas": [
           {
-            "tipo": "1. Recuerdo seguro (concreta)",
-            "pregunta": "¿Qué parte del cuento 'Las Caletas y Puentes del Sur' con Almirante te gustó más imaginar?"
+            "tipo": "1. Emoción en el momento",
+            "pregunta": "¿Qué sintió Fresia cuando abrió su cuaderno azul y vio que faltaban estrofas de la canción?",
+            "pista_apoyo": "Hablar de esa inquietud normal cuando queremos hacer algo bien y no recordamos todo solos."
           },
           {
-            "tipo": "2. Emoción con causa (perspectiva)",
-            "pregunta": "¿Por qué crees que los personajes se sintieron más tranquilos cuando se escucharon con calma?"
+            "tipo": "2. Leer las intenciones",
+            "pregunta": "¿Cómo nos dimos cuenta de las verdaderas intenciones de los vecinos cuando Fresia tocó sus puertas?",
+            "pista_apoyo": "Fijarse en sus gestos amables: pausaron sus tareas, sonrieron y sumaron lo que cada uno sabía."
           },
           {
-            "tipo": "3. Puente cariñoso al día de hoy",
-            "pregunta": "Si hoy nos pasa algo parecido a lo del cuento, ¿qué idea chiquitita podríamos probar juntos, Fresia?"
+            "tipo": "3. En el colegio con amigos",
+            "pregunta": "¿Qué harías tú si un amigo hace eso en el colegio y te pide ayuda porque olvidó una parte de la tarea?",
+            "pista_apoyo": "Conversar cómo se siente acompañar a un compañero sin burlarse ni apurarlo."
           }
         ],
-        "escalera_apoyo": "Sin presión: si no tiene ganas de responder, comenta tú primero tu parte favorita en una frase corta y déjalo abierto."
+        "escalera_apoyo": "Conversación libre: si tu hija prefiere solo escuchar, cuéntale tú primero qué parte te gustó."
       },
       "story_text": "Hoy al caer la tarde sobre Caleta Niebla, una bruma suave cubrió el agua quieta. Los palafitos celestes y amarillos encendieron sus primeras luces tibias junto a la orilla. Fresia se puso su chaleco de lana tejida y salió al balcón de madera. Llevaba en la mano su cuaderno azul y una caracola nacarada en el bolsillo. A su lado caminaba el Almirante, un gato atigrado con media oreja. El gato movía la cola despacio y miraba hacia el muelle con ojos tranquilos. En la isla existía una antigua melodía de tres estrofas muy querida por todos. Los vecinos la tarareaban cada atardecer para guiar a los botes entre la bruma. Hoy Fresia abrió su cuaderno y notó que solo recordaba la primera parte. Fresia sintió una pequeña inquietud en el pecho porque quería ayudar a su tío Lalo. Él volvía desde lejos con sus redes llenas de algas brillantes y necesitaba oír la orilla. El Almirante rozó con la cabeza las botas amarillas de Fresia con mucha calma. Después avanzó sin apuro por la pasarela de tablas hacia la panadería de la señora Rosa. Fresia tocó la puerta de madera tibia y pidió ayuda con total confianza. Preguntó si alguien recordaba cómo seguía la antigua canción del faro. La señora Rosa dejó sobre el mesón una bandeja de tortillas calientes recién horneadas. Sonrió con cariño y cantó despacito la segunda estrofa mientras echaba una pizca de sal. Fresia se sintió muy aliviada porque descubrió que no tenía que saberlo todo sola. Anotó cada palabra con letra clara en las hojas de su cuaderno azul. Luego caminaron juntos por el sendero de conchuelas blancas hasta el taller de don Ramiro. Él tejía cordeles bajo un farol color miel muy tibio. Al oír las dos estrofas, don Ramiro llevó el ritmo con golpecitos suaves en su mesa. Recordó la mitad del último verso, aunque aún faltaban las cuatro notas del final. Entonces el Almirante subió tres peldaños de piedra hacia la torre baja del farero. Allí don Clemente limpiaba el cristal redondo del faro con un paño seco. Don Clemente escuchó a sus vecinos y abrió una sonrisa serena bajo su gorra de lana. Cantó con voz grave las cuatro notas finales, lentas como las olas pequeñas. Entre los cuatro reunieron la canción entera junto a la baranda de madera del muelle. Fresia acercó la caracola nacarada para que el sonido viajara suave sobre el mar quieto. Al oír las voces de su caleta, apareció la lucecita amarilla del bote del tío Lalo. Amarró su cuerda en el poste de madera sin ningún apuro ni tropiezo. Sobre una banca del muelle había quedado doblado un pequeño mapa de papel grueso. Traía dibujado un puente colgante de Quillay Alto como un guiño amable para otro día. De regreso en el palafito celeste, la tetera sonaba bajito sobre la cocina tibia. Afuera el agua seguía meciendo los botes de madera en completa paz. El Almirante se enroscó echado y tranquilo encima de su cojín gris junto a la ventana. Respiraba lento y parejo mientras caía la noche sureña. Fresia dejó su cuaderno con la canción completa sobre el velador de madera. Apagó la lámpara ámbar sintiéndose muy acompañada por el cariño de toda su comunidad. Cerró los ojos esperando los caminos suaves de mañana, sabiendo que tu familia te abraza siempre.",
       "synthesis_elapsed_seconds": 190.71
