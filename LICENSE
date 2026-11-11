@@ -1,0 +1,22 @@
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   Copyright 2026 ROANSO SpA (Chile) — "Un Cuento, Un Abrazo" Project
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+   ---
+   Multi-Licensing Notice for Non-Code Open Public Goods:
+   - Curated narrative/voice datasets & metadata ledgers (`corpus/`): CC-BY-4.0
+   - Bedside E-Ink audio reader hardware specifications (`docs/EINK_OPEN_HARDWARE_SPEC.md`): CERN-OHL-P-2.0

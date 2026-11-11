@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Un Cuento, Un Abrazo · Human-Scale Neuro-Inclusive Storytelling</title>
+  <style>
+    :root {
+      --bg: #0c1017;
+      --bg-card: #151c28;
+      --bg-elevated: #1e2738;
+      --text: #f5efe6;
+      --text-muted: #9ba8bf;
+      --accent: #f4a261;
+      --accent-soft: rgba(244, 162, 97, 0.15);
+      --ok: #52b788;
+      --ok-soft: rgba(82, 183, 136, 0.15);
+      --warn: #e76f51;
+      --border: rgba(255, 255, 255, 0.09);
+      --story-bg: #111722;
+      --story-text: #f5ebe0;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-serif: 'Georgia', 'Cambria', serif;
+    }
+    body.amber-sleep {
+      --bg: #060402; --bg-card: #100b06; --bg-elevated: #1a1209;
+      --text: #e6a15c; --text-muted: #996836; --accent: #d97724;
+      --accent-soft: rgba(217, 119, 36, 0.15); --border: rgba(230, 161, 92, 0.15);
+      --story-bg: #090603; --story-text: #e6a15c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-sans); min-height: 100vh; }
+    header {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      padding: 14px 26px; border-bottom: 1px solid var(--border); background: var(--bg-card); gap: 14px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo {
+      width: 42px; height: 42px; border-radius: 12px; background: var(--accent-soft);
+      border: 1.5px solid var(--accent); display: flex; align-items: center; justify-content: center;
+      font-weight: 800; color: var(--accent);
+    }
+    .brand-title h1 { font-size: 1.08rem; }
+    .brand-title p { font-size: 0.77rem; color: var(--text-muted); }
+    .nav-tabs { display: flex; gap: 6px; background: var(--bg); padding: 4px; border-radius: 11px; border: 1px solid var(--border); }
+    .tab-btn { background: transparent; color: var(--text-muted); border: none; padding: 8px 14px; border-radius: 8px; font-size: 0.83rem; font-weight: 600; cursor: pointer; }
+    .tab-btn.active { background: var(--accent); color: #120d07; }
+    .btn {
+      background: var(--bg-elevated); color: var(--text); border: 1px solid var(--border);
+      padding: 8px 13px; border-radius: 9px; font-size: 0.82rem; cursor: pointer; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+    }
+    .btn-primary, .btn.active { background: var(--accent); color: #120d07; border-color: var(--accent); }
+    .container { max-width: 1320px; margin: 0 auto; padding: 22px 24px; }
+    .pane { display: none; }
+    .pane.active { display: block; }
+    .grid-main { display: grid; grid-template-columns: 330px 1fr; gap: 22px; }
+    @media (max-width: 940px) { .grid-main { grid-template-columns: 1fr; } }
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 18px; }
+    .card h2 { font-size: 0.84rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .profile-item { padding: 12px 14px; border-radius: 11px; border: 1px solid var(--border); background: var(--bg-elevated); cursor: pointer; margin-bottom: 8px; }
+    .profile-item.selected, .profile-item:hover { border-color: var(--accent); background: var(--accent-soft); }
+    .tag { font-size: 0.73rem; padding: 3px 9px; border-radius: 999px; background: var(--bg-elevated); border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 4px; }
+    .tag.ok { border-color: var(--ok); color: var(--ok); background: var(--ok-soft); }
+    .tag.accent { border-color: var(--accent); color: var(--accent); }
+    .story-reader { background: var(--story-bg); color: var(--story-text); border: 1px solid var(--border); border-radius: 14px; padding: 28px 32px; font-family: var(--font-serif); font-size: 1.16rem; line-height: 1.82; white-space: pre-wrap; }
+    .sensory-axes-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .parent-q-item { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+    .parent-q-item strong { display: block; font-size: 0.75rem; color: var(--accent); margin-bottom: 3px; }
+    input, select { padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-elevated); color: var(--text); font-size: 0.84rem; width: 100%; }
+    .eink-device-wrap { display: flex; justify-content: center; padding: 8px 0 24px; }
+    .eink-bezel { width: 490px; max-width: 100%; background: #2b2d30; border-radius: 26px; padding: 24px 26px 30px; border: 2px solid #3d4045; }
+    .eink-screen { background: #ece8dc; color: #181715; border-radius: 10px; padding: 22px 24px; min-height: 560px; display: flex; flex-direction: column; justify-content: space-between; font-family: var(--font-serif); }
+    .eink-body { font-size: 1.05rem; line-height: 1.7; text-align: justify; overflow-y: auto; max-height: 430px; }
+    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+    .modal-backdrop.open { display: flex; }
+    .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; max-width: 620px; width: 100%; padding: 22px; max-height: 90vh; overflow-y: auto; }
+    .form-row { margin-bottom: 10px; }
+    .form-row label { display: block; font-size: 0.76rem; color: var(--text-muted); margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-logo">RO</div>
+      <div class="brand-title">
+        <h1>Un Cuento, Un Abrazo · Open Human-Scale Engine</h1>
+        <p>Small Local Models (&le;7.6B) · Zero Frontier APIs · Law 21.719 Child Privacy · Apache-2.0</p>
+      </div>
+    </div>
+    <div class="nav-tabs">
+      <button class="tab-btn active" id="btnTab1" onclick="switchTab('story')">🌙 1. Sensory Profiles &amp; Stories</button>
+      <button class="tab-btn" id="btnTab2" onclick="switchTab('eink')">📖 2. E-Ink 6" Simulator &amp; INFLESZ QA</button>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn" id="btnAmber" onclick="document.body.classList.toggle('amber-sleep');this.classList.toggle('active')">🕯️ Amber Sleep Mode</button>
+      <a class="btn" href="/api/human_scale_audit" target="_blank">🔍 Mozilla Audit JSON</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <div id="privacyBanner" class="card" style="display:none;border-color:var(--ok);background:var(--ok-soft);"></div>
+
+    <div class="pane active" id="paneStory">
+      <div class="grid-main">
+        <aside>
+          <div class="card">
+            <h2>
+              <span>Universal Design Archetypes</span>
+              <button class="btn btn-primary" style="padding:4px 10px;font-size:0.75rem;" onclick="document.getElementById('modalBackdrop').classList.add('open')">+ New Profile</button>
+            </h2>
+            <div id="profileList"></div>
+          </div>
+        </aside>
+        <section>
+          <div class="card" style="border-color:var(--accent);">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <span class="tag accent" id="worldBadge">Caleta Niebla</span>
+              <span class="tag ok">🔒 Zero Diagnosis Stored (Law 21.719)</span>
+              <span class="tag ok">⚡ Local GPU (&le;7.6B SLM + OmniVoice 0.6B)</span>
+            </div>
+            <h2 style="font-size:1.22rem;color:var(--text);text-transform:none;margin-bottom:6px;" id="chapTitle">Loading...</h2>
+            <p style="font-size:0.84rem;color:var(--text-muted);" id="chapResumen"></p>
+            <div class="sensory-axes-bar" id="axesBar"></div>
+          </div>
+
+          <div class="card" id="parentCard">
+            <h2>
+              <span>💬 Parent-Child Shared Conversation Card (2-Min Morning Scaffolding)</span>
+              <span class="tag ok" id="valueBadge">Value</span>
+            </h2>
+            <div id="questionsBox"></div>
+            <p style="font-size:0.78rem;color:var(--accent);margin-top:6px;" id="scaffoldingNote"></p>
+          </div>
+
+          <article class="story-reader" id="storyReader"></article>
+        </section>
+      </div>
+    </div>
+
+    <div class="pane" id="paneEink">
+      <div class="grid-main">
+        <aside>
+          <div class="card">
+            <h2>Deterministic &amp; Readability QA</h2>
+            <div id="qaBox" style="font-size:0.84rem;line-height:1.62;"></div>
+          </div>
+          <div class="card">
+            <h2>Open E-Ink 6" Controls (CERN-OHL-P)</h2>
+            <div class="form-row">
+              <label>Warm Amber Frontlight (2200K)</label>
+              <input type="range" min="0" max="100" value="45" oninput="updateWarmth(this.value)" id="warmthSlider" />
+            </div>
+            <button class="btn" onclick="window.open('/api/export_data?profile=' + activeId, '_blank')" style="width:100%;justify-content:center;margin-top:8px;">🛡️ Export Data Portability (Law 21.719)</button>
+          </div>
+        </aside>
+        <section>
+          <div class="eink-device-wrap">
+            <div class="eink-bezel">
+              <div class="eink-screen" id="einkScreen">
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-family:var(--font-sans);font-size:0.72rem;font-weight:700;border-bottom:1px solid rgba(0,0,0,0.2);padding-bottom:8px;margin-bottom:12px;">
+                    <span id="einkHeader">ROANSO E-INK</span>
+                    <span>🔊 BT A2DP · 🔋 Replaceable LiPo</span>
+                  </div>
+                  <h3 id="einkTitle" style="margin-bottom:10px;"></h3>
+                  <div class="eink-body" id="einkBody"></div>
+                </div>
+                <div style="border-top:1px solid rgba(0,0,0,0.2);padding-top:8px;margin-top:12px;display:flex;justify-content:space-between;font-family:var(--font-sans);font-size:0.74rem;">
+                  <span>No Browser · No Camera · No Mic</span>
+                  <span id="einkWords"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+      <h2 style="margin-bottom:8px;">Universal Design Onboarding (Law 21.719 Sanitizer Live Demo)</h2>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:10px;">Try typing clinical terms like <code>TEA</code>, <code>ADHD</code>, or <code>methylphenidate</code> in Sensitivities—the engine strips medical diagnoses before writing to disk.</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+        <button class="btn" onclick="setPreset('literal')">🧩 Literal &amp; Predictable Ritual</button>
+        <button class="btn" onclick="setPreset('hook')">⚡ 15s Hook + Sleep Ramp</button>
+        <button class="btn" onclick="setPreset('multiverse')">🌌 Chilean Multiverse</button>
+      </div>
+      <div class="form-row"><label>Nickname</label><input id="npApodo" value="Valeria" /></div>
+      <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div><label>Axis 1 · Language</label><select id="npLenguaje"><option value="literal_claro">Literal &amp; Explicit</option><option value="agil_visual">Agile &amp; Concrete</option><option value="literario_rico">Warm Literary</option></select></div>
+        <div><label>Axis 2 · Structure</label><select id="npEstructura"><option value="ritual_anticipado">Predictable Ritual</option><option value="enganche_rampa_calma">15s Hook + Sleep Ramp</option><option value="serie_multiverso">Episodic Multiverse</option></select></div>
+      </div>
+      <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div><label>Axis 3 · Acoustic</label><select id="npSonoro"><option value="monovoz_estable">Steady Mono-Voice (0.89x)</option><option value="dinamico_a_calmo">Expressive → Whisper Ramp</option><option value="multivoz_personajes">Narrator + Approved Voices</option></select></div>
+        <div><label>Axis 4 · Theme Focus</label><select id="npFoco"><option value="interes_profundo">Special-Interest Anchor</option><option value="misiones_hiperfoco">Dynamic Passion Quests</option><option value="rotacion_multiverso">12-Genre Rotation</option></select></div>
+      </div>
+      <div class="form-row"><label>Special Interests</label><input id="npIntereses" value="relojes de madera, trenes del sur" /></div>
+      <div class="form-row"><label>Sensitivities / Topics to Avoid (Test Law 21.719 filter here)</label><input id="npProhibidos" value="ruidos bruscos, oscuridad amenazante" /></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px;">
+        <button class="btn" onclick="document.getElementById('modalBackdrop').classList.remove('open')">Cancel</button>
+        <button class="btn btn-primary" onclick="createDemoProfile()">Create Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let profiles = [];
+    let activeId = 'demo_lucas';
+
+    function switchTab(t) {
+      document.getElementById('paneStory').classList.toggle('active', t === 'story');
+      document.getElementById('paneEink').classList.toggle('active', t === 'eink');
+      document.getElementById('btnTab1').classList.toggle('active', t === 'story');
+      document.getElementById('btnTab2').classList.toggle('active', t === 'eink');
+    }
+
+    function updateWarmth(val) {
+      const r = Math.round(236 - val * 0.06), g = Math.round(232 - val * 0.42), b = Math.round(220 - val * 0.82);
+      document.getElementById('einkScreen').style.background = `rgb(${r},${g},${b})`;
+    }
+
+    function setPreset(p) {
+      if (p === 'literal') {
+        npLenguaje.value = 'literal_claro'; npEstructura.value = 'ritual_anticipado'; npSonoro.value = 'monovoz_estable'; npFoco.value = 'interes_profundo';
+      } else if (p === 'hook') {
+        npLenguaje.value = 'agil_visual'; npEstructura.value = 'enganche_rampa_calma'; npSonoro.value = 'dinamico_a_calmo'; npFoco.value = 'misiones_hiperfoco';
+      } else {
+        npLenguaje.value = 'literario_rico'; npEstructura.value = 'serie_multiverso'; npSonoro.value = 'multivoz_personajes'; npFoco.value = 'rotacion_multiverso';
+      }
+    }
+
+    async function loadAll(selId = null) {
+      const res = await fetch('/api/profiles');
+      const data = await res.json();
+      profiles = data.profiles || [];
+      if (selId) activeId = selId;
+      document.getElementById('profileList').innerHTML = profiles.map(p => `
+        <div class="profile-item ${p.id === activeId ? 'selected' : ''}" onclick="loadAll('${p.id}')">
+          <div style="display:flex;justify-content:space-between;font-weight:700;">
+            <span>${p.apodo} (${p.edad}y)</span>
+            <span class="tag ok">${p.chapters[0]?.words || 0} words</span>
+          </div>
+          <div style="font-size:0.76rem;color:var(--text-muted);margin-top:3px;">${p.rol_protagonista}</div>
+          <div style="font-size:0.72rem;color:var(--accent);margin-top:4px;">${p.perfil_sensorial_etiquetas?.estructura || ''}</div>
+        </div>
+      `).join('');
+      const prof = profiles.find(x => x.id === activeId) || profiles[0];
+      if (!prof) return;
+      const cres = await fetch(`/api/chapter?profile=${encodeURIComponent(prof.id)}&cap=1`);
+      const ch = await cres.json();
+      document.getElementById('worldBadge').textContent = `📍 ${ch.mundo}`;
+      document.getElementById('chapTitle').textContent = ch.titulo;
+      document.getElementById('chapResumen').textContent = ch.resumen;
+      document.getElementById('storyReader').textContent = ch.texto;
+      const et = prof.perfil_sensorial_etiquetas || {};
+      document.getElementById('axesBar').innerHTML = `
+        <span class="tag accent">🗣️ ${et.lenguaje}</span>
+        <span class="tag">🧭 ${et.estructura}</span>
+        <span class="tag">🎚️ ${et.estimulo_sonoro}</span>
+      `;
+      const g = ch.guia_padres || {};
+      document.getElementById('valueBadge').textContent = `🌱 ${g.valor_del_capitulo || ''}`;
+      document.getElementById('questionsBox').innerHTML = (g.preguntas || []).map(q => `
+        <div class="parent-q-item"><strong>${q.tipo}</strong><p style="font-size:0.84rem;">${q.pregunta}</p></div>
+      `).join('');
+      document.getElementById('scaffoldingNote').textContent = `💡 ${g.escalera_apoyo || ''}`;
+
+      document.getElementById('einkHeader').textContent = `ROANSO E-INK · ${prof.apodo.toUpperCase()}`;
+      document.getElementById('einkTitle').textContent = ch.titulo;
+      document.getElementById('einkBody').textContent = ch.texto;
+      document.getElementById('einkWords').textContent = `${ch.validacion.palabras} palabras`;
+      updateWarmth(document.getElementById('warmthSlider').value);
+
+      const leg = ch.legibilidad || {};
+      document.getElementById('qaBox').innerHTML = `
+        <div style="margin-bottom:8px;"><strong>1. Deterministic &amp; Carol Gray 10.2 Linter:</strong> <span style="color:${ch.validacion.valido ? 'var(--ok)' : 'var(--warn)'}">${ch.validacion.valido ? '✅ PASS (0 sermons, 0 2nd-person directives, gender &amp; closure OK)' : ch.validacion.errores.join(' | ')}</span></div>
+        <div style="margin-bottom:8px;"><strong>2. Spanish Readability (INFLESZ / Szigriszt-Pazos):</strong> <strong>${leg.szigriszt_pazos}</strong> (${leg.nivel_lectura})</div>
+        <div style="margin-bottom:8px;"><strong>3. Fernández-Huerta / Gutiérrez-Polini:</strong> ${leg.fernandez_huerta} / ${leg.gutierrez_polini}</div>
+        <div><strong>4. Sentence Pace:</strong> <strong>${leg.palabras_por_oracion}</strong> words/sentence (P90: ${leg.p90_palabras_oracion})</div>
+      `;
+    }
+
+    async function createDemoProfile() {
+      const res = await fetch('/api/profiles', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          nombre: npApodo.value, apodo: npApodo.value, edad: 7,
+          intereses_especiales: npIntereses.value, prohibidos: npProhibidos.value,
+          perfil_sensorial: { lenguaje: npLenguaje.value, estructura: npEstructura.value, estimulo_sonoro: npSonoro.value, foco_tematico: npFoco.value }
+        })
+      });
+      const data = await res.json();
+      document.getElementById('modalBackdrop').classList.remove('open');
+      const b = document.getElementById('privacyBanner');
+      if ((data.advertencias_ley21719 || []).length) {
+        b.style.display = 'block';
+        b.innerHTML = `🛡️ <strong>Law 21.719 Intake Sanitizer Triggered:</strong> Stripped clinical/diagnostic terms (<code>${data.advertencias_ley21719.join(', ')}</code>) before saving to disk.`;
+      } else { b.style.display = 'none'; }
+      await loadAll(data.profile_id);
+    }
+
+    loadAll();
+  </script>
+</body>
+</html>

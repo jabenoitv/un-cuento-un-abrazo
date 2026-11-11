@@ -1,0 +1,76 @@
+{
+  "nino_id": "demo_fresia",
+  "titulo": "Las Caletas y Puentes del Sur",
+  "protagonista": {
+    "nombre": "Fresia",
+    "apodo": "Fresia",
+    "rol": "Guardiana del Cuaderno de Canciones de Caleta Niebla",
+    "edad": 9,
+    "genero": "femenino"
+  },
+  "perfil_sensorial": {
+    "lenguaje": "literario_rico",
+    "estructura": "serie_multiverso",
+    "estimulo_sonoro": "dinamico_a_calmo",
+    "foco_tematico": "rotacion_multiverso"
+  },
+  "intereses_especiales": [
+    "faros del sur de Chile",
+    "caracolas marinas",
+    "mapas de islas"
+  ],
+  "valores_trabajar": [
+    "Pedir ayuda a la comunidad con confianza",
+    "Lo que uno olvida solo se recuerda entre todos",
+    "Calma antes de dormir"
+  ],
+  "temas_evitar": [
+    "naufragios",
+    "tormentas violentas",
+    "gritos"
+  ],
+  "mascotas": {
+    "almirante": {
+      "nombre": "Almirante",
+      "apodo": "Almirante",
+      "genero": "macho",
+      "articulo": "el",
+      "estado": "vivo",
+      "raza": "Gato atigrado con media oreja (el Capitán Mostaza viajero del multiverso)"
+    }
+  },
+  "multiverso_v2": {
+    "lugares_puente": {
+      "Caleta Niebla": "Caleta tranquila en una isla del sur de Chile con faro tibio, palafitos de colores y botes de madera.",
+      "Quillay Alto": "Pueblo entre cerros con panadería tibia, puente colgante sobre el estero y estación antigua.",
+      "Calle de los Faroles": "Calle donde hay una tienda de paraguas verdes y relojes antiguos."
+    },
+    "reglas_de_variedad": [
+      "Rotar 12 géneros narrativos sin repetir en los últimos 4 capítulos.",
+      "Cada capítulo cierra su propia historia esta noche y deja solo un guiño amable al multiverso.",
+      "Respetar concordancia gramatical estricta de mascotas y línea temporal hoy noche -> mañana."
+    ]
+  },
+  "historial_capitulos": [
+    {
+      "capitulo": 1,
+      "titulo": "La canción de los palafitos en Caleta Niebla",
+      "resumen": "Fresia reúne entre tres vecinos los versos olvidados de una melodía suave de faro mientras el Almirante guía la linterna del muelle.",
+      "mundo": "Caleta Niebla (Sur de Chile)",
+      "genero": "Mar y folclore chileno suave",
+      "hilo_abierto": "En el muelle quedó apoyado un pequeño mapa doblado firmado por Pilar Ojeda.",
+      "guinos": [
+        "El gato Almirante con media oreja es el mismo Capitán Mostaza de Quillay Alto."
+      ]
+    }
+  ],
+  "reglas_produccion": {
+    "duracion_minima_segundos": 270,
+    "palabras_minimas": 550,
+    "palabras_maximas": 950,
+    "prosa_continua": true,
+    "frase_cierre_regex": "tu\\s+familia\\s+te\\s+abraza\\s+siempre",
+    "frase_cierre_texto": "tu familia te abraza siempre",
+    "voz_id": "catalogo_chileno_abuela_sur"
+  }
+}

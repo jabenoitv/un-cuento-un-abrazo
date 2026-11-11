@@ -1,0 +1,49 @@
+{
+  "nino_id": "demo_mateo",
+  "titulo": "El Faro de los Inventos de Mateo",
+  "protagonista": {
+    "nombre": "Mateo",
+    "apodo": "Mateo",
+    "rol": "Explorador de Puentes y Relojes de Arena",
+    "edad": 6,
+    "genero": "masculino"
+  },
+  "perfil_sensorial": {
+    "lenguaje": "agil_visual",
+    "estructura": "enganche_rampa_calma",
+    "estimulo_sonoro": "dinamico_a_calmo",
+    "foco_tematico": "misiones_hiperfoco"
+  },
+  "intereses_especiales": [
+    "relojes de arena",
+    "telescopios y barcos",
+    "engranajes de madera"
+  ],
+  "valores_trabajar": [
+    "compartir turnos sin enojarse",
+    "pedir disculpas cuando hay un roce tonto en el recreo",
+    "levantarse después de equivocarse"
+  ],
+  "temas_evitar": [
+    "tormentas eléctricas",
+    "arañas"
+  ],
+  "mascotas": {
+    "luna": {
+      "nombre": "Luna",
+      "apodo": "Luna",
+      "genero": "hembra",
+      "articulo": "la",
+      "estado": "viva",
+      "raza": "Gata barcina curiosa"
+    }
+  },
+  "reglas_produccion": {
+    "duracion_minima_segundos": 240,
+    "palabras_minimas": 150,
+    "palabras_maximas": 950,
+    "frase_cierre_regex": "te\\s+queremos\\s+mucho",
+    "frase_cierre_texto": "te queremos mucho",
+    "voz_id": "catalogo_chileno_abuelo_sur"
+  }
+}

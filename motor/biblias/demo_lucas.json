@@ -1,0 +1,50 @@
+{
+  "nino_id": "demo_lucas",
+  "titulo": "La Estación Tranquila de los Trenes de Lucas",
+  "protagonista": {
+    "nombre": "Lucas",
+    "apodo": "Lucas",
+    "rol": "Jefe de Horarios y Vías de Quillay Alto",
+    "edad": 7,
+    "genero": "masculino"
+  },
+  "perfil_sensorial": {
+    "lenguaje": "literal_claro",
+    "estructura": "ritual_anticipado",
+    "estimulo_sonoro": "monovoz_estable",
+    "foco_tematico": "interes_profundo"
+  },
+  "intereses_especiales": [
+    "trenes eléctricos y locomotoras",
+    "horarios exactos y mapas de estaciones",
+    "faroles ámbar"
+  ],
+  "valores_trabajar": [
+    "entender que dos amigos pueden jugar distinto y ponerse de acuerdo",
+    "avisar con calma cuando un ruido molesta",
+    "celebrar su talento para ordenar detalles"
+  ],
+  "temas_evitar": [
+    "sirenas fuertes",
+    "globos que revientan",
+    "sorpresas bruscas"
+  ],
+  "mascotas": {
+    "canela": {
+      "nombre": "Canela",
+      "apodo": "Canela",
+      "genero": "hembra",
+      "articulo": "la",
+      "estado": "viva",
+      "raza": "Perrita mestiza color miel de pasos silenciosos"
+    }
+  },
+  "reglas_produccion": {
+    "duracion_minima_segundos": 260,
+    "palabras_minimas": 650,
+    "palabras_maximas": 950,
+    "frase_cierre_regex": "descansa\\s+tranquilo,\\s+que\\s+aqu[ií]\\s+te\\s+cuidamos",
+    "frase_cierre_texto": "descansa tranquilo, que aquí te cuidamos",
+    "voz_id": "catalogo_chileno_mama_serena"
+  }
+}
