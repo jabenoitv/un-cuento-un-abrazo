@@ -1,0 +1,27 @@
+# syntax=docker/dockerfile:1
+# Control Plane liviano (CPU) para VPS arrendado (Hetzner CX22 / Railway / Fly.io ~US$7-15/mes)
+FROM python:3.11-slim AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app/platform:/app
+
+WORKDIR /app
+
+RUN groupadd -r roanso && useradd -r -g roanso -d /app roanso
+
+COPY motor /app/motor
+COPY platform/pyproject.toml /app/platform/pyproject.toml
+COPY platform/ARCHITECTURE_SCALE.md /app/platform/ARCHITECTURE_SCALE.md
+COPY platform/roanso_platform /app/platform/roanso_platform
+
+RUN pip install --no-cache-dir "/app/platform[postgres]" && \
+    mkdir -p /app/storage_data && chown -R roanso:roanso /app
+
+USER roanso
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=3)"
+
+CMD ["uvicorn", "roanso_platform.api:create_app", "--factory", "--host", "0.0.0.0", "--port", "8080", "--workers", "2"]

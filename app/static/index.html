@@ -121,6 +121,10 @@
             </div>
             <h2 style="font-size:1.22rem;color:var(--text);text-transform:none;margin-bottom:6px;" id="chapTitle">Loading...</h2>
             <p style="font-size:0.84rem;color:var(--text-muted);" id="chapResumen"></p>
+            <div id="audioPlayerWrap" style="display:none;margin-top:12px;padding:10px 12px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;">
+              <div style="font-size:0.76rem;color:var(--accent);font-weight:600;margin-bottom:6px;">🔊 Verified Nocturnal Audio (-20 LUFS · -52 dBFS Room Tone · Whisper WER &le; 0.02)</div>
+              <audio id="chapAudio" controls preload="metadata" style="width:100%;height:38px;"></audio>
+            </div>
             <div class="sensory-axes-bar" id="axesBar"></div>
           </div>
 
@@ -253,6 +257,15 @@
       document.getElementById('worldBadge').textContent = `📍 ${ch.mundo}`;
       document.getElementById('chapTitle').textContent = ch.titulo;
       document.getElementById('chapResumen').textContent = ch.resumen;
+      const aw = document.getElementById('audioPlayerWrap');
+      const ae = document.getElementById('chapAudio');
+      if (ch.audio_url) {
+        aw.style.display = 'block';
+        ae.src = ch.audio_url;
+      } else {
+        aw.style.display = 'none';
+        ae.removeAttribute('src');
+      }
       document.getElementById('storyReader').textContent = ch.texto;
       const et = prof.perfil_sensorial_etiquetas || {};
       document.getElementById('axesBar').innerHTML = `

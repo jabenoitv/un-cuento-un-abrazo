@@ -78,6 +78,34 @@ CLIFFHANGERS_ANGUSTIANTES = [
     r"algo\s+terrible\s+estaba\s+por\s+ocurrir",
 ]
 
+# Filtro léxico de identidad chilena: bloquea doblaje neutro, mexicanismos y voseo peninsular
+LEXICO_NO_CHILENO_DOBLAJE = [
+    (r"\bchamarras?\b", "chamarra", "chaqueta, parka o chaleco"),
+    (r"\balbercas?\b", "alberca", "piscina"),
+    (r"\bfrijol(?:es)?\b", "frijoles", "porotos"),
+    (r"\bplatic(?:ar|aba|aban|aron|[oó]|amos)\b", "platicar", "conversar"),
+    (r"\bpopotes?\b", "popote", "bombilla"),
+    (r"\bcacahuat[ea]s?\b", "cacahuate", "maní"),
+    (r"\bautob[uú]s(?:es)?\b", "autobús", "micro o bus"),
+    (r"\b(?:chamacos?|chavos?)\b", "chamaco/chavo", "niño o chiquillo"),
+    (r"\b(?:vosotros|vuestros?|vuestras?|hab[eé]is|ten[eé]is|pod[eé]is)\b", "vosotros/peninsular", "ustedes"),
+    (r"\bordenador(?:es)?\b", "ordenador", "computador"),
+    (r"\bzumos?\b", "zumo", "jugo"),
+    (r"\bemparedados?\b", "emparedado", "pan o sándwich"),
+    (r"\bneveras?\b", "nevera", "refrigerador"),
+]
+
+DESVIO_PRIMERA_PERSONA = re.compile(
+    r"(?:^\s*querid[oa]\s+[a-záéíóúüñ]+\s*,)|"
+    r"\b(?:"
+    r"(?:pap[aá]|mam[aá])\s+y\s+yo|"
+    r"caminamos\s+(?:juntos|cerca|por)|"
+    r"camin[aá]bamos\s+(?:juntos|cerca|por)|"
+    r"nos\s+(?:acercamos|fuimos|pusimos|sentamos|re[ií]mos|abrigamos|mantuvo)"
+    r")\b",
+    re.IGNORECASE,
+)
+
 PERFIL_SENSORIAL_DEFAULTS = {
     "lenguaje": "literario_rico",          # literal_claro | agil_visual | literario_rico
     "estructura": "serie_multiverso",      # ritual_anticipado | enganche_rampa_calma | serie_multiverso
@@ -319,6 +347,18 @@ def analizar_cuento_multinino(texto: str, biblia: Dict[str, Any]) -> Dict[str, A
     for pat in DIRECTIVAS_SEGUNDA_PERSONA:
         if re.search(pat, texto, re.IGNORECASE):
             errores.append("ERROR: Directiva en 2ª persona detectada (viola criterio Carol Gray 10.2: describir, no ordenar).")
+
+    # 7b. Identidad léxica chilena y punto de vista narrativo en 3ª persona cálida
+    if reglas.get("exigir_espanol_chileno", True):
+        for pat, term_extranjero, sug_cl in LEXICO_NO_CHILENO_DOBLAJE:
+            if re.search(pat, texto, re.IGNORECASE):
+                errores.append(
+                    f"ERROR: Léxico neutro/no-chileno detectado ('{term_extranjero}'); en Chile usar '{sug_cl}'."
+                )
+    if reglas.get("narrador_tercera_persona", True) and DESVIO_PRIMERA_PERSONA.search(texto):
+        errores.append(
+            "ERROR: Desvío a 1ª persona ('papá/mamá y yo'); narra en 3ª persona cálida acompañando al protagonista."
+        )
 
     # 8. Reglas adaptativas según los 4 Ejes Sensoriales
     if perfil["lenguaje"] == "literal_claro":

@@ -1,0 +1,141 @@
+{
+  "elapsed_seconds": 62.21,
+  "corpus_audit": {
+    "corpus_version": "corpus-v1.0",
+    "works_ingested": 9,
+    "total_clean_words": 101968,
+    "bedtime_safe_passages": 497,
+    "ledger_csv": "..\\corpus_limpio\\licencias_corpus.csv",
+    "passages_jsonl": "..\\corpus_limpio\\pasajes_nocturnos_seguros.jsonl",
+    "credits_md": "..\\corpus_limpio\\CREDITOS_LICENCIAS.md"
+  },
+  "verified_ledger_works": 9,
+  "qlora_dataset_audit": {
+    "verified_works": 9,
+    "sft_train_examples": 447,
+    "sft_val_examples": 50,
+    "dpo_preference_pairs": 3,
+    "train_jsonl": "training_data\\sft_train_chileno.jsonl",
+    "val_jsonl": "training_data\\sft_val_chileno.jsonl",
+    "dpo_jsonl": "training_data\\dpo_preferencias_chilenas.jsonl",
+    "ollama_modelfile": "training_data\\Modelfile.roanso-chileno"
+  },
+  "benchmark_summary": {
+    "profiles_tested": 3,
+    "vanilla_pass_rate_pct": 0.0,
+    "roanso_pass_rate_pct": 100.0,
+    "roanso_non_chilean_lexicon_total": 0,
+    "roanso_10gram_collisions_total": 0
+  },
+  "profiles": [
+    {
+      "profile_id": "demo_lucas",
+      "sensory_axes": {
+        "lenguaje": "literal_claro",
+        "estructura": "ritual_anticipado",
+        "estimulo_sonoro": "monovoz_estable",
+        "foco_tematico": "interes_profundo"
+      },
+      "vanilla_qwen25_7b": {
+        "valid": false,
+        "attempts": 1,
+        "word_count": 167,
+        "szigriszt_pazos": 70.3,
+        "words_per_sentence": 20.9,
+        "non_chilean_lexicon_hits": [
+          "autobús"
+        ],
+        "first_person_drift": false,
+        "anti_regurgitation_10gram_ok": true,
+        "errors": [
+          "ERROR: Largo fuera de rango (167 palabras). Para Lucas debe ir entre 200 y 780.",
+          "ERROR: Léxico neutro/no-chileno detectado ('autobús'); en Chile usar 'micro o bus'."
+        ],
+        "excerpt": "Hoy fue un día un poco raro, Lucas, pero tú fuiste un niño valiente. Al salir de la escuela, el aire helado nos rodeaba y con una sonrisa, te ayudé a ponerte el abrigo y el gorro. Mientras caminábamos hacia la parada del autobús, hablamos de tus sueños de ser un gran explorador, ..."
+      },
+      "roanso_chileno_7b": {
+        "valid": true,
+        "attempts": 2,
+        "word_count": 315,
+        "szigriszt_pazos": 68.3,
+        "words_per_sentence": 13.7,
+        "non_chilean_lexicon_hits": [],
+        "first_person_drift": false,
+        "anti_regurgitation_10gram_ok": true,
+        "errors": [],
+        "excerpt": "En la tarde de hoy, mientras Lucas salía de clases, el micro empezó a hacer frío. Se pusieron la chaqueta y el chaleco, y se fueron caminando hacia la vereda cerca de la piscina municipal. La Canela, su fiel compañera, caminaba a su lado con pasos silenciosos. Lucas y la Canela c..."
+      }
+    },
+    {
+      "profile_id": "demo_mateo",
+      "sensory_axes": {
+        "lenguaje": "agil_visual",
+        "estructura": "enganche_rampa_calma",
+        "estimulo_sonoro": "dinamico_a_calmo",
+        "foco_tematico": "misiones_hiperfoco"
+      },
+      "vanilla_qwen25_7b": {
+        "valid": false,
+        "attempts": 1,
+        "word_count": 188,
+        "szigriszt_pazos": 80.0,
+        "words_per_sentence": 14.5,
+        "non_chilean_lexicon_hits": [],
+        "first_person_drift": true,
+        "anti_regurgitation_10gram_ok": true,
+        "errors": [
+          "ERROR: Largo fuera de rango (188 palabras). Para Mateo debe ir entre 200 y 780.",
+          "ERROR: Desvío a 1ª persona ('papá/mamá y yo'); narra en 3ª persona cálida acompañando al protagonista."
+        ],
+        "excerpt": "Hoy fue un día especial, Mateo. Nos fuimos al parque cerca del agua que tanto te gusta, donde el sol brillaba en el cielo azul. Después de jugar en la hierba verde y correr entre los árboles, vimos que el sol se ocultaba poco a poco, pintando las nubes de rojo y naranja. Entonces..."
+      },
+      "roanso_chileno_7b": {
+        "valid": true,
+        "attempts": 1,
+        "word_count": 506,
+        "szigriszt_pazos": 68.1,
+        "words_per_sentence": 16.3,
+        "non_chilean_lexicon_hits": [],
+        "first_person_drift": false,
+        "anti_regurgitation_10gram_ok": true,
+        "errors": [],
+        "excerpt": "Mateo y la Luna salieron al parque de la comuna, donde los árboles susurraban con las brisas de la tarde y el sol pintaba el cielo con tonos de naranja y rosa. Caminaron por la vereda, Mateo miraba con curiosidad los relojes de arena que algunos niños jugaban con, y la Luna, siem..."
+      }
+    },
+    {
+      "profile_id": "demo_fresia",
+      "sensory_axes": {
+        "lenguaje": "literario_rico",
+        "estructura": "serie_multiverso",
+        "estimulo_sonoro": "dinamico_a_calmo",
+        "foco_tematico": "rotacion_multiverso"
+      },
+      "vanilla_qwen25_7b": {
+        "valid": false,
+        "attempts": 1,
+        "word_count": 251,
+        "szigriszt_pazos": 66.6,
+        "words_per_sentence": 25.1,
+        "non_chilean_lexicon_hits": [],
+        "first_person_drift": true,
+        "anti_regurgitation_10gram_ok": true,
+        "errors": [
+          "ERROR: Desvío a 1ª persona ('papá/mamá y yo'); narra en 3ª persona cálida acompañando al protagonista."
+        ],
+        "excerpt": "Hoy, mientras caminábamos por el muelle sureño bajo el cielo que se tiñó de tonos anaranjados, Fresia, mi pequeña, escuchaba fascinada cómo los ancianos contaban historias del faro que iluminaba el puerto desde tiempos inmemoriales. La brisa fría del ocaso acariciaba su rostro, y..."
+      },
+      "roanso_chileno_7b": {
+        "valid": true,
+        "attempts": 1,
+        "word_count": 299,
+        "szigriszt_pazos": 61.5,
+        "words_per_sentence": 23.0,
+        "non_chilean_lexicon_hits": [],
+        "first_person_drift": false,
+        "anti_regurgitation_10gram_ok": true,
+        "errors": [],
+        "excerpt": "En la orilla del muelle sureño, bajo el teatro de un cielo que se tiñaba de rojo y naranja, Fresia y el Almirante se sentaron en una frazada suave. Fresia, con su chaqueta de lana y un chaleco amarillo, conversaba con los vecinos que pasaban por la vereda, compartiendo risas y an..."
+      }
+    }
+  ]
+}

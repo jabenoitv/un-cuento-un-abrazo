@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Un Cuento, Un Abrazo">
+  <rect width="256" height="256" rx="52" fill="#0b0805"/>
+  <rect x="14" y="14" width="228" height="228" rx="40" fill="none" stroke="#d97724" stroke-width="4" opacity="0.55"/>
+  <path d="M158 52c-30 6-52 33-52 65 0 37 30 67 67 67 13 0 25-4 35-10-12 22-35 36-62 36-39 0-71-32-71-71 0-36 27-66 62-70 7-1 14 0 21 3z" fill="#f4a261"/>
+  <path d="M58 188c22-10 46-10 70 0 24-10 48-10 70 0v22c-22-10-46-10-70 0-24-10-48-10-70 0v-22z" fill="#e6a15c" opacity="0.9"/>
+  <circle cx="178" cy="84" r="6" fill="#f5ebe0"/>
+</svg>

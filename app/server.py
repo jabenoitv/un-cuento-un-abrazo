@@ -185,6 +185,7 @@ class ShowcaseHandler(BaseHTTPRequestHandler):
             texto = cap_path.read_text(encoding="utf-8", errors="ignore") if cap_path.exists() else ""
             analisis = analizar_cuento_multinino(texto, biblia)
             title = cap_meta.get("titulo") or f"Capítulo {cap_num}"
+            showcase_mp3 = BASE_DIR / "platform" / "showcase_assets" / f"{pid}_cap{cap_num}.mp3"
             self._send_json({
                 "profile": pid,
                 "capitulo": cap_num,
@@ -193,6 +194,7 @@ class ShowcaseHandler(BaseHTTPRequestHandler):
                 "hilo_abierto": cap_meta.get("hilo_abierto", ""),
                 "mundo": cap_meta.get("mundo", summary["titulo_serie"]),
                 "texto": texto,
+                "audio_url": f"/api/audio?profile={pid}&cap={cap_num}" if showcase_mp3.exists() else None,
                 "validacion": {
                     "valido": analisis["valido"],
                     "palabras": len(texto.split()),
@@ -203,6 +205,25 @@ class ShowcaseHandler(BaseHTTPRequestHandler):
                 "perfil_sensorial": analisis["perfil_sensorial"],
                 "guia_padres": generar_guia_padres(texto, biblia, title),
             })
+            return
+
+        if path == "/api/audio":
+            pid = qs.get("profile", ["demo_lucas"])[0]
+            cap_num = int(qs.get("cap", ["1"])[0])
+            if not re.fullmatch(r"demo_[a-z0-9_]+", pid):
+                self.send_error(400, "Invalid profile id")
+                return
+            mp3_file = BASE_DIR / "platform" / "showcase_assets" / f"{pid}_cap{cap_num}.mp3"
+            if not mp3_file.exists():
+                self.send_error(404, "Showcase audio not found")
+                return
+            raw = mp3_file.read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", "audio/mpeg")
+            self.send_header("Content-Length", str(len(raw)))
+            self.send_header("Accept-Ranges", "bytes")
+            self.end_headers()
+            self.wfile.write(raw)
             return
 
         self.send_error(404, "Not found")

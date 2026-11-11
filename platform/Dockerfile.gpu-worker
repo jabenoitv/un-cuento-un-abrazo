@@ -1,0 +1,25 @@
+# syntax=docker/dockerfile:1
+# Worker Elástico GPU para nodos arrendados por minuto (RunPod / Modal / Hetzner GPU: L4 / A10G / RTX 4090)
+FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app/platform:/app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.11 python3-pip ffmpeg libsndfile1 && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY motor /app/motor
+COPY voces /app/voces
+COPY platform/pyproject.toml /app/platform/pyproject.toml
+COPY platform/ARCHITECTURE_SCALE.md /app/platform/ARCHITECTURE_SCALE.md
+COPY platform/roanso_platform /app/platform/roanso_platform
+
+RUN python3.11 -m pip install --no-cache-dir "/app/platform[gpu-worker]"
+
+# Sin puertos entrantes expuestos: el worker hace outbound HTTPS pull y puede apagar a cero (--drain-and-exit)
+CMD ["python3.11", "-m", "roanso_platform.gpu_worker", "--drain-and-exit"]

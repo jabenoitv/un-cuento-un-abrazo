@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#060402" />
+  <title>Un Cuento, Un Abrazo · ROANSO SpA (Human-Scale AI)</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="/pwa/icon.svg" />
+  <link rel="stylesheet" href="/pwa/app.css" />
+</head>
+<body>
+  <header class="topbar" id="mainHeader">
+    <div class="brand">
+      <img src="/pwa/icon.svg" alt="ROANSO" class="brand-icon" />
+      <div>
+        <h1>Un Cuento, Un Abrazo · ROANSO SpA</h1>
+        <p>SLM Abierto &le;7.6B · Audio Nocturno Verificado (Whisper) · Privacidad Infantil Ley 21.719</p>
+      </div>
+    </div>
+
+    <nav class="mode-nav" aria-label="Modos de uso">
+      <button class="tab-btn active" id="tabShowcase" onclick="RoansoApp.switchMode('showcase')">1. Vitrina Abierta &amp; Audio Real</button>
+      <button class="tab-btn" id="tabBedside" onclick="RoansoApp.enterChildBedsideMode()">2. Modo Niño Ámbar (Cero Chatbots)</button>
+      <button class="tab-btn" id="tabParent" onclick="RoansoApp.switchMode('parent')">3. Portal Adulto (Ley 21.719)</button>
+    </nav>
+
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn" id="btnAmberToggle" onclick="RoansoApp.toggleAmber()">Modo Luz Ámbar</button>
+      <a class="btn" href="/healthz" target="_blank" rel="noopener">Manifiesto JSON</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="globalToast" class="status-banner" role="status"></div>
+
+    <!-- MODO 1: VITRINA PÚBLICA AUDITADA (SIN LOGIN) -->
+    <section class="pane active" id="paneShowcase">
+      <div class="grid-2col">
+        <aside>
+          <div class="card">
+            <h2><span>Arquetipos Neuro-Inclusivos (CC-BY-4.0)</span></h2>
+            <div id="archetypeList"></div>
+          </div>
+          <div class="card">
+            <h2><span>Catálogo Ético de Voces (Apache-2.0)</span></h2>
+            <div id="ethicalVoiceList" style="font-size:0.82rem;color:var(--text-muted);"></div>
+          </div>
+        </aside>
+
+        <div>
+          <div class="card">
+            <div class="badges" id="showcaseBadges"></div>
+            <h3 id="showcaseTitle" style="font-size:1.3rem;margin-bottom:4px;">Cargando vitrina verificada...</h3>
+            <p id="showcaseMeta" style="font-size:0.84rem;color:var(--text-muted);"></p>
+
+            <div class="audio-dock">
+              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                <strong id="audioVoiceLabel" style="font-size:0.84rem;">Audio Nocturno Masterizado (-20 LUFS · Room Tone -52 dBFS)</strong>
+                <div style="display:flex;gap:8px;">
+                  <button class="btn" id="btnSaveOffline" onclick="RoansoApp.cacheCurrentShowcaseOffline()">Guardar Offline (Modo Avión)</button>
+                  <button class="btn" onclick="RoansoApp.toggleEinkView()">Vista Lector E-Ink 6&quot;</button>
+                </div>
+              </div>
+              <audio id="showcaseAudio" controls preload="metadata"></audio>
+              <div id="acousticTelemetryBar" style="font-size:0.78rem;color:var(--text-muted);"></div>
+            </div>
+
+            <div id="storyStandardView" class="story-box"></div>
+            <div id="storyEinkView" style="display:none;">
+              <div class="eink-frame">
+                <div class="eink-paper">
+                  <div style="font-size:0.74rem;border-bottom:1px solid #bbb;padding-bottom:6px;margin-bottom:12px;display:flex;justify-content:space-between;">
+                    <span>ROANSO E-INK 6&quot; (CERN-OHL-P-2.0)</span>
+                    <span>SIN WI-FI · CERO LUZ AZUL</span>
+                  </div>
+                  <div id="einkTextBody"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2><span>Tarjeta Matutina de Conversación Compartida (3 Preguntas — Sin Sermones)</span></h2>
+            <div id="parentGuideList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODO 2: REPRODUCTOR INFANTIL BLOQUEADO (CERO CHATBOTS / SALIDA CON PIN PARENTAL) -->
+    <section class="pane" id="paneBedside">
+      <div class="child-bedside-shell">
+        <p style="font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;opacity:0.8;">Modo Sueño Seguro · Cero Pantallas Interactivas · Cero Chatbots</p>
+        <h2 id="bedsideStoryTitle" style="font-size:1.35rem;margin-top:10px;color:#f4a261;">Hora de descansar</h2>
+        <p id="bedsideSubtitle" style="font-size:0.88rem;opacity:0.85;margin-top:4px;">Deja el dispositivo a un lado y cierra los ojos</p>
+
+        <button class="giant-play-btn" id="btnGiantPlay" onclick="RoansoApp.toggleBedsidePlayback()">Escuchar</button>
+        <audio id="bedsideAudio" preload="auto"></audio>
+
+        <div style="margin-top:14px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+          <span class="badge accent" id="bedsideOfflineBadge">Audio Verificado</span>
+          <span class="badge accent">Apagado automático al finalizar</span>
+        </div>
+
+        <div style="margin-top:30px;padding-top:18px;border-top:1px solid rgba(217,119,36,0.22);">
+          <p style="font-size:0.76rem;margin-bottom:8px;">Salida exclusiva para madres, padres o cuidadores:</p>
+          <div style="display:flex;gap:8px;max-width:290px;margin:0 auto;">
+            <input type="password" id="bedsidePinInput" inputmode="numeric" maxlength="8" placeholder="PIN adulto (o 0000 demo)" />
+            <button class="btn" onclick="RoansoApp.exitChildBedsideMode()">Salir</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODO 3: PORTAL ADULTO MULTI-TENANT (JWT + BÓVEDA AES-256-GCM + ARCO LEY 21.719) -->
+    <section class="pane" id="paneParent">
+      <div id="authGateSection" class="grid-equal">
+        <div class="card">
+          <h2><span>Crear Cuenta Familiar (Ley 21.719 Chile)</span></h2>
+          <div class="field"><label>Nombre de la Familia</label><input id="regFamilyName" placeholder="Ej.: Familia Soto" /></div>
+          <div class="field"><label>Nombre Adulto Responsable</label><input id="regFullName" placeholder="Ej.: Carolina Soto" /></div>
+          <div class="field"><label>Correo Electrónico</label><input id="regEmail" type="email" placeholder="familia@ejemplo.cl" /></div>
+          <div class="field"><label>Contraseña (mín. 8 caracteres)</label><input id="regPassword" type="password" placeholder="********" /></div>
+          <div class="field"><label>PIN Parental (4 a 8 dígitos para desbloquear Modo Niño)</label><input id="regPin" type="password" inputmode="numeric" maxlength="8" placeholder="4321" /></div>
+          <button class="btn btn-primary" onclick="RoansoApp.registerFamily()">Registrar Cuenta Familiar Segura</button>
+        </div>
+
+        <div class="card">
+          <h2><span>Ingresar a Cuenta Familiar Existente</span></h2>
+          <div class="field"><label>Correo Electrónico</label><input id="loginEmail" type="email" placeholder="familia@ejemplo.cl" /></div>
+          <div class="field"><label>Contraseña</label><input id="loginPassword" type="password" placeholder="********" /></div>
+          <button class="btn btn-primary" onclick="RoansoApp.loginFamily()">Iniciar Sesión</button>
+        </div>
+      </div>
+
+      <div id="familyDashboardSection" style="display:none;">
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+          <div>
+            <strong id="sessionBadgeText">Sesión Familiar Activa</strong>
+            <p style="font-size:0.78rem;color:var(--text-muted);">Cero diagnósticos médicos almacenados · Aislamiento estricto por familia</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn" onclick="RoansoApp.exportFamilyData()">Exportar Datos JSON (Portabilidad ARCO)</button>
+            <button class="btn btn-danger" onclick="RoansoApp.eraseFamilyAccount()">Eliminar Cuenta y Destruir Datos</button>
+            <button class="btn" onclick="RoansoApp.logout()">Cerrar Sesión</button>
+          </div>
+        </div>
+
+        <div class="grid-equal">
+          <div class="card">
+            <h2><span>1. Perfil Sensorial Universal (Sanitizador Ley 21.719 Activo)</span></h2>
+            <div class="field"><label>Apodo del Niño/a (solo primer nombre o apodo)</label><input id="childAlias" placeholder="Ej.: Martín" /></div>
+            <div class="field"><label>Edad (3 a 13 años)</label><input id="childAge" type="number" min="3" max="13" value="7" /></div>
+            <div class="field">
+              <label>Eje 1 · Claridad de Lenguaje</label>
+              <select id="axisLenguaje">
+                <option value="literal_claro">Literal y explícito (frases cortas, modismos explicados)</option>
+                <option value="agil_visual">Ágil y concreto (acción directa)</option>
+                <option value="literario_rico">Literario y cálido (metáforas suaves)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Eje 2 · Estructura Nocturna</label>
+              <select id="axisEstructura">
+                <option value="ritual_anticipado">Ritual predecible con anticipación</option>
+                <option value="enganche_rampa_calma">Enganche rápido + Rampa de sueño</option>
+                <option value="serie_multiverso">Serie episódica del Multiverso</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Eje 3 · Estímulo Sonoro</label>
+              <select id="axisSonoro">
+                <option value="monovoz_estable">Monovoz pareja y serena (0.90x estable)</option>
+                <option value="dinamico_a_calmo">Sleep Ramp (expresivo al inicio, susurro al cierre)</option>
+              </select>
+            </div>
+            <div class="field"><label>Intereses Especiales (separados por coma)</label><input id="childInterests" placeholder="trenes eléctricos, mapas del sur" /></div>
+            <div class="field"><label>Frase Familiar de Cierre</label><input id="childClosing" value="en casa te queremos mucho" /></div>
+            <div class="field"><label>Notas Libres (términos clínicos son omitidos automáticamente antes de guardar)</label><input id="childNotes" placeholder="Evitar globos que revientan y sirenas" /></div>
+            <button class="btn btn-primary" onclick="RoansoApp.createChild()">Guardar Perfil Sensorial</button>
+            <div id="childrenList" style="margin-top:14px;"></div>
+          </div>
+
+          <div>
+            <div class="card">
+              <h2><span>2. Encolar Cuento de Esta Noche (Worker GPU Elástico)</span></h2>
+              <div class="field"><label>Seleccionar Perfil</label><select id="jobChildSelect"></select></div>
+              <div class="field"><label>Seleccionar Voz (Catálogo Ético o Bóveda Parental)</label><select id="jobVoiceSelect"></select></div>
+              <div class="field"><label>Semilla Cotidiana del Día (observada por mamá/papá)</label><textarea id="jobSeed" rows="3" placeholder="Hoy compartieron turnos jugando con barquitos de papel en la tarde..."></textarea></div>
+              <button class="btn btn-primary" onclick="RoansoApp.enqueueJob()">Enviar a Cola de Producción Nocturna</button>
+              <div id="activeJobBox" style="margin-top:12px;font-size:0.82rem;color:var(--text-muted);"></div>
+              <div id="familyChaptersBox" style="margin-top:12px;"></div>
+            </div>
+
+            <div class="card">
+              <h2><span>3. Bóveda Vocal Adulta AES-256-GCM (Revocación en 1 Clic)</span></h2>
+              <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:10px;">Prohibido clonar voces de menores. El timbre adulto se cifra con HKDF por familia y se destruye criptográficamente al revocar.</p>
+              <div class="field"><label>Etiqueta de Voz Adulta (>18 años)</label><input id="voiceDisplayName" placeholder="Ej.: Voz Mamá / Voz Papá" value="Voz Adulta Cifrada (Demo)" /></div>
+              <div class="field"><label>Declaración Hablada de Consentimiento Biométrico</label><input id="voiceConsentText" value="Yo adulto responsable autorizo expresamente a ROANSO a cifrar mi voz únicamente para los cuentos nocturnos de mi familia." /></div>
+              <button class="btn" style="margin-bottom:12px;" onclick="RoansoApp.enrollAdultVoice()">Cifrar y Guardar Voz Adulta (AES-256-GCM)</button>
+              <div id="familyVoicesBox"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/pwa/app.js"></script>
+</body>
+</html>

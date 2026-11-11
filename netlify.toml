@@ -1,0 +1,65 @@
+"$schema" = "https://open-api.netlify.com/netlify.schema.json"
+
+[build]
+  command = "node scripts/build-netlify.mjs"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Service-Worker-Allowed = "/"
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/static-api/*.json"
+  [headers.values]
+    Content-Type = "application/json; charset=utf-8"
+    Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/static-api/audio/*.mp3"
+  [headers.values]
+    Content-Type = "audio/mpeg"
+    Accept-Ranges = "bytes"
+    Cache-Control = "public, max-age=86400"
+
+[[redirects]]
+  from = "/healthz"
+  to = "/static-api/healthz.json"
+  status = 200
+
+[[redirects]]
+  from = "/v1/showcase/archetypes"
+  to = "/static-api/archetypes.json"
+  status = 200
+
+[[redirects]]
+  from = "/v1/showcase/voices"
+  to = "/static-api/voices.json"
+  status = 200
+
+[[redirects]]
+  from = "/v1/showcase/audio/demo_lucas"
+  to = "/static-api/audio/demo_lucas.mp3"
+  status = 200
+
+[[redirects]]
+  from = "/v1/showcase/audio/demo_mateo"
+  to = "/static-api/audio/demo_mateo.mp3"
+  status = 200
+
+[[redirects]]
+  from = "/v1/showcase/audio/demo_fresia"
+  to = "/static-api/audio/demo_fresia.mp3"
+  status = 200

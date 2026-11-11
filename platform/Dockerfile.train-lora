@@ -1,0 +1,27 @@
+# syntax=docker/dockerfile:1
+# Contenedor efímero para entrenar LoRA Chileno en GPU arrendada (RunPod L4 / RTX 4090 ~25 min, ~US$0.45-$1.10)
+FROM pytorch/pytorch:2.4.0-cuda12.4-cudnn9-runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app/platform:/app
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir \
+    "transformers>=4.45.0" \
+    "peft>=0.13.0" \
+    "trl>=0.11.0" \
+    "bitsandbytes>=0.44.0" \
+    "datasets>=3.0.0" \
+    "accelerate>=1.0.0"
+
+COPY motor /app/motor
+COPY corpus_limpio /app/corpus_limpio
+COPY platform /app/platform
+
+CMD ["python", "platform/training/train_qlora_rented_gpu.py", \
+     "--base-model", "Qwen/Qwen2.5-7B-Instruct", \
+     "--corpus-dir", "/app/corpus_limpio", \
+     "--dataset-dir", "/app/training_data", \
+     "--output-dir", "/app/checkpoints/roanso-chileno-qwen7b-lora-v1"]

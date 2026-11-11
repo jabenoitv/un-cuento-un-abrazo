@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "governance": {
+    "ley_21719_compliant": true,
+    "zero_minor_voice_cloning": true,
+    "zero_third_party_actor_scraping": true,
+    "commercial_license": "Apache-2.0"
+  },
+  "voices": [
+    {
+      "id": "catalog-chileno-sereno-m1",
+      "display_name": "Narrador Sureño Sereno (Catálogo Ético es-CL)",
+      "gender": "male",
+      "locale": "es-CL",
+      "generation_method": "OmniVoice Open-Weights Deterministic Voice Design",
+      "license": "Apache-2.0",
+      "zero_minor_cloning": true,
+      "zero_third_party_scraping": true,
+      "seed": 202611,
+      "instruct": "male, middle-aged, low pitch",
+      "pt_filename": "catalog-chileno-sereno-m1.pt",
+      "pt_size_bytes": 15335,
+      "pt_sha256": "49bc86404b2985cd46ef140c6605078dd6acab4bcb973aeda64b54bed98b9c83",
+      "reference_wer": 0.0,
+      "spectral_centroid_hz": 2287.2,
+      "reference_duration_seconds": 9.04,
+      "elapsed_seconds": 5.68
+    },
+    {
+      "id": "catalog-chilena-calida-f1",
+      "display_name": "Narradora Valle Central Cálida (Catálogo Ético es-CL)",
+      "gender": "female",
+      "locale": "es-CL",
+      "generation_method": "OmniVoice Open-Weights Deterministic Voice Design",
+      "license": "Apache-2.0",
+      "zero_minor_cloning": true,
+      "zero_third_party_scraping": true,
+      "seed": 202612,
+      "instruct": "female, middle-aged, low pitch",
+      "pt_filename": "catalog-chilena-calida-f1.pt",
+      "pt_size_bytes": 14951,
+      "pt_sha256": "f93572afa678f1f13eff1a61aa3467eea08d7f185c02fd92695a2c503a158728",
+      "reference_wer": 0.0,
+      "spectral_centroid_hz": 2212.8,
+      "reference_duration_seconds": 8.76,
+      "elapsed_seconds": 4.29
+    }
+  ]
+}

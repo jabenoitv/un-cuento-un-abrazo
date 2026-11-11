@@ -1,4 +1,9 @@
 __pycache__/
+.pytest_cache/
+node_modules/
+dist/
+.netlify/
+.netlify
 *.py[cod]
 *$py.class
 .venv/
@@ -8,6 +13,7 @@ venv/
 *.onnx
 *.safetensors
 *.mp3
+!platform/showcase_assets/demo_*_cap1.mp3
 *.wav
 !samples/*.wav
 motor/revisiones/*.json

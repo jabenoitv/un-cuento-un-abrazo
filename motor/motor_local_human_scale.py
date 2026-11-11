@@ -132,6 +132,9 @@ def verificar_anti_regurgitacion_ngramas(
     }
     colisiones: List[str] = []
     for txt_file in sorted(corpus_dir.glob("*.txt")):
+        # Las plantillas propias CC-BY de ROANSO comparten saludos rituales predecibles por diseño
+        if txt_file.name.startswith("roanso_ccby_"):
+            continue
         tokens_ref = _normalizar_tokens(txt_file.read_text(encoding="utf-8", errors="ignore"))
         if len(tokens_ref) < n:
             continue
@@ -175,9 +178,53 @@ def invocar_slm_local(
     return (raw.get("response") or "").strip()
 
 
+def _cargar_ancla_estilo_corpus_humano(corpus_dir: Path = CORPUS_LOCAL_DIR) -> str:
+    """Recupera un pasaje nocturno sereno del corpus abierto auditado para anclar cadencia chilena/sureña."""
+    pasajes_file = corpus_dir / "pasajes_nocturnos_seguros.jsonl"
+    if not pasajes_file.exists():
+        return ""
+    try:
+        lines = [ln for ln in pasajes_file.read_text(encoding="utf-8").splitlines() if ln.strip()]
+        for line in lines:
+            row = json.loads(line)
+            txt = str(row.get("texto", ""))
+            if row.get("idioma") == "es-CL" and "--" not in txt and "Caleta Niebla" in txt:
+                return txt[:340]
+        for line in lines:
+            row = json.loads(line)
+            txt = str(row.get("texto", ""))
+            if "--" not in txt and len(txt) >= 120:
+                return txt[:340]
+        return str(json.loads(lines[0]).get("texto", ""))[:340] if lines else ""
+    except Exception:
+        return ""
+
+
 def construir_prompt_escritor_local(biblia: Dict[str, Any], semilla_padre: str) -> str:
     """Construye el prompt de generación adaptado a modelos locales compactos (7B-9B)."""
     prot = biblia.get("protagonista", {})
+    apodo = prot.get("apodo", "el niño/a")
+    genero_prot = str(prot.get("genero", "")).strip().lower()
+    if genero_prot in ("femenino", "mujer", "niña", "nina"):
+        etiqueta_prot = f"la niña {apodo} ({prot.get('edad', 7)} años, género femenino — usa siempre pronombres y adjetivos femeninos para {apodo})"
+    elif genero_prot in ("masculino", "hombre", "niño", "nino"):
+        etiqueta_prot = f"el niño {apodo} ({prot.get('edad', 7)} años, género masculino)"
+    else:
+        etiqueta_prot = f"{apodo} ({prot.get('edad', 7)} años)"
+    mascota = prot.get("mascota", {})
+    if not (isinstance(mascota, dict) and mascota.get("nombre")) and isinstance(biblia.get("mascotas"), dict):
+        first_pet = next(iter(biblia["mascotas"].values()), {})
+        if isinstance(first_pet, dict):
+            mascota = first_pet
+    mascota_txt = ""
+    if isinstance(mascota, dict) and mascota.get("nombre"):
+        art = "la" if str(mascota.get("genero", "hembra")).lower() == "hembra" else "el"
+        especie_desc = mascota.get("especie") or mascota.get("raza") or "mascota"
+        mascota_txt = (
+            f" Su mascota compañera es {art} {mascota['nombre']} ({especie_desc}; "
+            f"usa siempre el artículo '{art}' y concordancia gramatical {mascota.get('genero', 'hembra')})."
+        )
+
     perfil = normalizar_perfil_sensorial(biblia)
     intereses = biblia.get("intereses_especiales", [])
     reglas = biblia.get("reglas_produccion", {})
@@ -187,18 +234,28 @@ def construir_prompt_escritor_local(biblia: Dict[str, Any], semilla_padre: str) 
     valores = ", ".join(biblia.get("valores_trabajar", ["calma", "empatía mutua"]))
     evitar = ", ".join(biblia.get("temas_evitar", [])) or "ninguno adicional"
     instrucciones_ejes = construir_instrucciones_ejes(perfil, intereses)
+    ancla_estilo = _cargar_ancla_estilo_corpus_humano()
+    bloque_ancla = (
+        f"\nCADENCIA LITERARIA DE REFERENCIA (SOLO ESTILO Y TONO, PROHIBIDO COPIAR FRASES):\n\"{ancla_estilo}\"\n"
+        if ancla_estilo
+        else ""
+    )
 
     return f"""Eres un narrador chileno cálido de cuentos nocturnos para dormir ("Un cuento, un abrazo").
-Escribe UN capítulo completo en prosa continua (un solo bloque sin saltos de línea, entre {min_pal} y {max_pal} palabras) para {prot.get('apodo', 'el niño/a')} ({prot.get('edad', 7)} años).
+Escribe UN capítulo completo en TERCERA PERSONA y prosa continua (un solo párrafo fluido sin saltos de línea ni títulos, entre {min_pal} y {max_pal} palabras) protagonizado por {etiqueta_prot}.{mascota_txt}
 
 SEMILLA DEL ADULTO CUIDADOR HOY: {semilla_padre}
 VALORES LAICOS A MOSTRAR CON ACCIONES (jamás sermonear ni usar 2ª persona imperativa): {valores}
 TEMAS PROHIBIDOS: médicos, hospitales, terapias, medicamentos, {evitar}
+IDENTIDAD LÉXICA CHILENA OBLIGATORIA:
+- Escribe en español de Chile afectivo y natural (ej.: chaqueta, chaleco, frazada, conversar, piscina, porotos, jugo, vereda, despacito).
+- PROHIBIDO usar español neutro de doblaje, mexicanismos o peninsularismos como: chamarra, platicar, alberca, frijoles, autobús, popote, cacahuate, zumo, nevera, ordenador o vosotros.
+- Narra siempre en 3ª persona cálida sobre {apodo} (jamás narres en 1ª persona diciendo 'papá y yo' o 'mamá y yo').
 REGLAS SENSORIALES Y ESTRUCTURALES OBLIGATORIAS:
 {instrucciones_ejes}
 - Toda emoción relevante debe explicitar su causa concreta ('se sintió tranquilo porque...').
 - No uses la palabra 'anoche'. La historia ocurre hoy en la tarde/noche y mira con calma hacia mañana.
-- Termina exactamente integrando la frase familiar: '{cierre}'."""
+- Termina integrando literalmente las palabras exactas de cierre familiar: '{cierre}'.{bloque_ancla}"""
 
 
 def revisar_cuento_human_scale(

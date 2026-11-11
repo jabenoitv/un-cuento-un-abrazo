@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=69.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "roanso-platform"
+version = "1.0.0"
+description = "ROANSO SpA — Un Cuento, Un Abrazo: Cloud Control Plane & Elastic Rented-GPU Worker Platform"
+readme = "ARCHITECTURE_SCALE.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "ROANSO SpA", email = "ingenieria@roanso.cl" }
+]
+dependencies = [
+  "fastapi>=0.111.0",
+  "uvicorn[standard]>=0.30.0",
+  "sqlalchemy>=2.0.30",
+  "pydantic>=2.7.0",
+  "pydantic-settings>=2.3.0",
+  "pyjwt>=2.8.0",
+  "cryptography>=42.0.0",
+  "boto3>=1.34.0",
+  "httpx>=0.27.0",
+  "numpy>=1.26.0",
+]
+
+[project.optional-dependencies]
+postgres = [
+  "psycopg[binary]>=3.1.18",
+  "alembic>=1.13.1",
+]
+gpu-worker = [
+  "numpy>=1.26.0",
+  "soundfile>=0.12.1",
+]
+dev = [
+  "pytest>=8.2.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["roanso_platform*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", ".."]

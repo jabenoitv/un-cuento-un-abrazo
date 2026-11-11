@@ -21,11 +21,25 @@ FORBIDDEN_PATTERNS = [
     (r"c:/users/jaben", "Local Windows user path"),
     (r"c:\\\\?tools\\\\?omnivoice", "Local Windows tool path"),
     (r"c:/tools/omnivoice", "Local Windows tool path"),
+    (r"c:\\\\?dev\\\\?cuentos-ia", "Local Windows workspace path"),
+    (r"c:/dev/cuentos-ia", "Local Windows workspace path"),
     (r"AIza[0-9A-Za-z\-_]{30,}", "Google API key"),
     (r"sk-[0-9A-Za-z]{25,}", "OpenAI/API secret key"),
 ]
 
-TEXT_EXTS = {".py", ".md", ".json", ".txt", ".html", ".csv", ".gitignore", ""}
+TEXT_EXTS = {
+    ".py", ".md", ".json", ".jsonl", ".txt", ".html", ".css", ".js",
+    ".mjs", ".mts", ".ts", ".sql",
+    ".webmanifest", ".svg", ".csv", ".yml", ".yaml", ".toml", ".example",
+    ".gitignore", "",
+}
+
+ALLOWED_TEXT_PREFIXES = ("Dockerfile.", "Modelfile.")
+ALLOWED_SHOWCASE_BINARIES = {
+    "platform/showcase_assets/demo_lucas_cap1.mp3",
+    "platform/showcase_assets/demo_mateo_cap1.mp3",
+    "platform/showcase_assets/demo_fresia_cap1.mp3",
+}
 
 
 def main() -> int:
@@ -35,9 +49,26 @@ def main() -> int:
         if not path.is_file():
             continue
         rel = path.relative_to(REPO_ROOT)
-        if ".git" in rel.parts or "__pycache__" in rel.parts or path.name == "audit_public_repo.py":
+        rel_posix = rel.as_posix()
+        if (
+            ".git" in rel.parts
+            or "__pycache__" in rel.parts
+            or ".pytest_cache" in rel.parts
+            or "node_modules" in rel.parts
+            or "dist" in rel.parts
+            or ".netlify" in rel.parts
+            or any(p.endswith(".egg-info") for p in rel.parts)
+            or path.name == "audit_public_repo.py"
+        ):
             continue
-        if path.suffix.lower() not in TEXT_EXTS and path.name != "LICENSE":
+        if rel_posix in ALLOWED_SHOWCASE_BINARIES:
+            continue
+        is_allowed_text = (
+            path.suffix.lower() in TEXT_EXTS
+            or path.name == "LICENSE"
+            or path.name.startswith(ALLOWED_TEXT_PREFIXES)
+        )
+        if not is_allowed_text:
             findings.append(f"Unexpected binary/non-text file: {rel}")
             continue
         text = path.read_text(encoding="utf-8", errors="ignore")

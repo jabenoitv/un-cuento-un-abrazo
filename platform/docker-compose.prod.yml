@@ -1,0 +1,70 @@
+name: roanso-cloud-stack
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-roanso}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD en .env}
+      POSTGRES_DB: ${POSTGRES_DB:-roanso_prod}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-roanso} -d ${POSTGRES_DB:-roanso_prod}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${ROANSO_S3_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${ROANSO_S3_SECRET_KEY:?Defina ROANSO_S3_SECRET_KEY en .env}
+    volumes:
+      - s3data:/data
+
+  control-plane:
+    build:
+      context: ..
+      dockerfile: platform/Dockerfile.api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ROANSO_ENVIRONMENT: prod
+      ROANSO_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-roanso}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-roanso_prod}
+      ROANSO_JWT_SECRET_KEY: ${ROANSO_JWT_SECRET_KEY:?Defina ROANSO_JWT_SECRET_KEY}
+      ROANSO_VOICE_VAULT_MASTER_KEY_B64: ${ROANSO_VOICE_VAULT_MASTER_KEY_B64:?Defina ROANSO_VOICE_VAULT_MASTER_KEY_B64}
+      ROANSO_WORKER_SHARED_TOKEN: ${ROANSO_WORKER_SHARED_TOKEN:?Defina ROANSO_WORKER_SHARED_TOKEN}
+      ROANSO_STORAGE_BACKEND: ${ROANSO_STORAGE_BACKEND:-s3}
+      ROANSO_S3_ENDPOINT_URL: ${ROANSO_S3_ENDPOINT_URL:-http://minio:9000}
+      ROANSO_S3_BUCKET: ${ROANSO_S3_BUCKET:-roanso-cuentos-prod}
+      ROANSO_S3_ACCESS_KEY: ${ROANSO_S3_ACCESS_KEY:-minioadmin}
+      ROANSO_S3_SECRET_KEY: ${ROANSO_S3_SECRET_KEY}
+    ports:
+      - "8080:8080"
+
+  gpu-worker:
+    profiles: ["gpu"]
+    build:
+      context: ..
+      dockerfile: platform/Dockerfile.gpu-worker
+    environment:
+      ROANSO_CONTROL_PLANE_URL: ${ROANSO_CONTROL_PLANE_URL:-https://api.uncuentounabrazo.cl}
+      ROANSO_WORKER_SHARED_TOKEN: ${ROANSO_WORKER_SHARED_TOKEN}
+      ROANSO_GPU_MODEL: ${ROANSO_GPU_MODEL:-NVIDIA-L4-24GB}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  pgdata:
+  s3data:

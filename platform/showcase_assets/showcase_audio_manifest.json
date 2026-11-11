@@ -1,0 +1,251 @@
+{
+  "schema_version": "1.0",
+  "total_elapsed_seconds": 367.13,
+  "license_stories_and_audio": "CC-BY-4.0 (ROANSO SpA Open Showcase)",
+  "voice_catalog": {
+    "schema_version": "1.0",
+    "governance": {
+      "ley_21719_compliant": true,
+      "zero_minor_voice_cloning": true,
+      "zero_third_party_actor_scraping": true,
+      "commercial_license": "Apache-2.0"
+    },
+    "voices": [
+      {
+        "id": "catalog-chileno-sereno-m1",
+        "display_name": "Narrador Sureño Sereno (Catálogo Ético es-CL)",
+        "gender": "male",
+        "locale": "es-CL",
+        "generation_method": "OmniVoice Open-Weights Deterministic Voice Design",
+        "license": "Apache-2.0",
+        "zero_minor_cloning": true,
+        "zero_third_party_scraping": true,
+        "seed": 202611,
+        "instruct": "male, middle-aged, low pitch",
+        "pt_filename": "catalog-chileno-sereno-m1.pt",
+        "pt_size_bytes": 15335,
+        "pt_sha256": "49bc86404b2985cd46ef140c6605078dd6acab4bcb973aeda64b54bed98b9c83",
+        "reference_wer": 0.0,
+        "spectral_centroid_hz": 2287.2,
+        "reference_duration_seconds": 9.04,
+        "elapsed_seconds": 5.68
+      },
+      {
+        "id": "catalog-chilena-calida-f1",
+        "display_name": "Narradora Valle Central Cálida (Catálogo Ético es-CL)",
+        "gender": "female",
+        "locale": "es-CL",
+        "generation_method": "OmniVoice Open-Weights Deterministic Voice Design",
+        "license": "Apache-2.0",
+        "zero_minor_cloning": true,
+        "zero_third_party_scraping": true,
+        "seed": 202612,
+        "instruct": "female, middle-aged, low pitch",
+        "pt_filename": "catalog-chilena-calida-f1.pt",
+        "pt_size_bytes": 14951,
+        "pt_sha256": "f93572afa678f1f13eff1a61aa3467eea08d7f185c02fd92695a2c503a158728",
+        "reference_wer": 0.0,
+        "spectral_centroid_hz": 2212.8,
+        "reference_duration_seconds": 8.76,
+        "elapsed_seconds": 4.29
+      }
+    ]
+  },
+  "archetypes": [
+    {
+      "profile_id": "demo_lucas",
+      "child_alias": "Lucas",
+      "age_years": 7,
+      "series_title": "La Estación Tranquila de los Trenes de Lucas",
+      "role": "Jefe de Horarios y Vías de Quillay Alto",
+      "sensory_axes": {
+        "lenguaje": "literal_claro",
+        "estructura": "ritual_anticipado",
+        "estimulo_sonoro": "monovoz_estable",
+        "foco_tematico": "interes_profundo"
+      },
+      "voice_id": "catalog-chilena-calida-f1",
+      "voice_display_name": "Narradora Valle Central Cálida (Catálogo Ético es-CL)",
+      "mp3_filename": "demo_lucas_cap1.mp3",
+      "mp3_size_bytes": 4362669,
+      "mp3_sha256": "ddaf92c9d123e79771fec9e6bb4fd4f80ffa69a5a2e797b59fa683e1d3b4ce14",
+      "word_count": 656,
+      "readability": {
+        "palabras": 656,
+        "oraciones": 52,
+        "palabras_por_oracion": 12.6,
+        "p90_palabras_oracion": 16,
+        "silabas_por_palabra": 1.92,
+        "fernandez_huerta": 79.0,
+        "szigriszt_pazos": 74.8,
+        "gutierrez_polini": 46.5,
+        "nivel_lectura": "Fácil-Fluido (7-10 años)"
+      },
+      "acoustic_qa": {
+        "whisper_wer": 0.0152,
+        "whisper_accuracy_pct": 98.48,
+        "whisper_similarity": 0.9863,
+        "duration_seconds": 272.61,
+        "words_per_minute": 144.4,
+        "overall_rms_dbfs": -21.01,
+        "opening_quarter_rms_dbfs": -21.05,
+        "closing_quarter_rms_dbfs": -20.81,
+        "sleep_ramp_attenuation_db": -0.24,
+        "spectral_centroid_hz": 2336.4,
+        "blocks_count": 26,
+        "block_repairs_triggered": 0
+      },
+      "parent_guide": {
+        "fundamento": "Conversación compartida opcional de 2 minutos al desayuno (práctica con mayor respaldo en comprensión narrativa e inferencia socioemocional).",
+        "valor_del_capitulo": "entender que dos amigos pueden jugar distinto y ponerse de acuerdo",
+        "preguntas": [
+          {
+            "tipo": "1. Recuerdo seguro (concreta)",
+            "pregunta": "¿Qué parte del cuento 'La Estación Tranquila de los Trenes de Lucas' con Canela te gustó más imaginar?"
+          },
+          {
+            "tipo": "2. Emoción con causa (perspectiva)",
+            "pregunta": "¿Por qué crees que los personajes se sintieron más tranquilos cuando se escucharon con calma?"
+          },
+          {
+            "tipo": "3. Puente cariñoso al día de hoy",
+            "pregunta": "Si hoy nos pasa algo parecido a lo del cuento, ¿qué idea chiquitita podríamos probar juntos, Lucas?"
+          }
+        ],
+        "escalera_apoyo": "Sin presión: si no tiene ganas de responder, comenta tú primero tu parte favorita en una frase corta y déjalo abierto."
+      },
+      "story_text": "Buenas noches, Lucas. Esta noche escucharemos un cuento tranquilo en la estación de Quillay Alto. Primero te cuento lo que va a pasar hoy para que no haya ninguna sorpresa. Lucas revisará el tablero de los trenes con la Canela. Después conversará con su amigo Tomás para ordenar el turno de las palancas. Al final dejará el tren azul durmiendo en su cochera tibia. En la estación de Quillay Alto ya encendieron los tres faroles de luz ámbar. Lucas lleva puesta su gorra azul de jefe de horarios. Camina despacio por el andén de piedra con su linterna tibia. A su lado va la Canela, moviendo la cola sin hacer ruido sobre las tablas. A Lucas le gusta mucho el tablero de madera. En ese tablero cada tren tiene su hora exacta y su cartel del mismo color. El tren número cuatro es el tren azul de los correos. Ese tren siempre llega a las ocho con diez minutos con las cartas de los cerros. Esta tarde vino de visita su amigo Tomás. Tomás vive cerca de la panadería La Espiga y también quería ayudar en la estación. Tomás hablaba rápido porque estaba muy entusiasmado mirando las vías. Quiso mover dos palancas de bronce al mismo tiempo para probar las luces. Lucas sintió los hombros apretados porque dos palancas juntas hacen un clic metálico muy fuerte. Además, si se mueven juntas se confunde el camino del andén. En vez de enojarse o quedarse callado, Lucas levantó una mano con calma. Le explicó a Tomás que ese ruido fuerte le molestaba en los oídos. Tomás soltó las palancas y escuchó con atención. Lo entendió al tiro, eso quiere decir que lo comprendió de inmediato y con cariño. Tomás contó que él hablaba fuerte solo porque tenía muchas ganas de encender el semáforo verde. Entonces los dos amigos buscaron un acuerdo claro donde ambos estuvieran cómodos. Acordaron dos pasos muy simples para trabajar en equipo. Primero Lucas revisaría en silencio la aguja del riel con su libreta cuadriculada. Después Lucas haría una seña suave con su linterna amarilla. Con esa seña, Tomás bajaría una sola palanca despacito hasta prender la luz verde. Lo probaron juntos y resultó muy bien. La palanca sonó bajito como una cuchara de madera y la luz verde brilló pareja. Don Anselmo pasó caminando con su maletín de cuero rumbo al puente colgante. Los saludó con el sombrero y felicitó el sistema tan claro que habían armado. Justo a las ocho con diez minutos apareció el tren azul por la curva del valle. Avanzó despacio sobre los rieles limpios, sin pitos ni ruidos bruscos. Solo se escuchaba el murmullo parejo y suave de sus ruedas tibias. El maquinista dejó el saco de cartas sobre el banco de pino. Lucas revisó las cuatro etiquetas de cartón y marcó un visto bueno suave con su lápiz grafito. Cada paquete tenía su número claro y su casillero listo para el reparto de la mañana. Luego el maquinista guardó el tren azul dentro de la cochera techada para que descansara hasta mañana. Tomás se despidió contento desde el sendero de tierra. Avisó con calma que en la próxima visita traerá pancito tibio para mirar un mapa nuevo. Adentro de la caseta, Lucas colgó su gorra azul en el gancho número uno. Cerró su libreta cuadriculada y la dejó derecha sobre la mesa ordenada. La Canela dio dos vueltas lentas sobre su alfombra color miel. Quedó echada y tranquila junto a la estufa apagada que todavía guardaba calorcito. Afuera los tres faroles ámbar bajaron su luz a la mitad. Todo lo anunciado para hoy quedó listo y en su lugar exacto. El tablero está en orden, la vía está silenciosa y el tren azul duerme bajo techo hasta mañana al despertar. Ahora tus hombros pueden soltarse blanditos sobre la cama tibia. Respira lento y parejo igual que la Canela en su alfombra, y descansa tranquilo, que aquí te cuidamos.",
+      "synthesis_elapsed_seconds": 73.92
+    },
+    {
+      "profile_id": "demo_mateo",
+      "child_alias": "Mateo",
+      "age_years": 6,
+      "series_title": "El Faro de los Inventos de Mateo",
+      "role": "Explorador de Puentes y Relojes de Arena",
+      "sensory_axes": {
+        "lenguaje": "agil_visual",
+        "estructura": "enganche_rampa_calma",
+        "estimulo_sonoro": "dinamico_a_calmo",
+        "foco_tematico": "misiones_hiperfoco"
+      },
+      "voice_id": "catalog-chileno-sereno-m1",
+      "voice_display_name": "Narrador Sureño Sereno (Catálogo Ético es-CL)",
+      "mp3_filename": "demo_mateo_cap1.mp3",
+      "mp3_size_bytes": 1862445,
+      "mp3_sha256": "372eea4bfbbc5062d773a34a697f2d134fecbfef56a2d0f53f87f3cb6218ef4a",
+      "word_count": 283,
+      "readability": {
+        "palabras": 283,
+        "oraciones": 15,
+        "palabras_por_oracion": 18.9,
+        "p90_palabras_oracion": 26,
+        "silabas_por_palabra": 1.98,
+        "fernandez_huerta": 69.1,
+        "szigriszt_pazos": 64.9,
+        "gutierrez_polini": 43.9,
+        "nivel_lectura": "Fácil-Fluido (7-10 años)"
+      },
+      "acoustic_qa": {
+        "whisper_wer": 0.0035,
+        "whisper_accuracy_pct": 99.65,
+        "whisper_similarity": 0.9965,
+        "duration_seconds": 116.34,
+        "words_per_minute": 146.0,
+        "overall_rms_dbfs": -23.03,
+        "opening_quarter_rms_dbfs": -22.45,
+        "closing_quarter_rms_dbfs": -23.93,
+        "sleep_ramp_attenuation_db": 1.48,
+        "spectral_centroid_hz": 2400.9,
+        "blocks_count": 9,
+        "block_repairs_triggered": 0
+      },
+      "parent_guide": {
+        "fundamento": "Conversación compartida opcional de 2 minutos al desayuno (práctica con mayor respaldo en comprensión narrativa e inferencia socioemocional).",
+        "valor_del_capitulo": "compartir turnos sin enojarse",
+        "preguntas": [
+          {
+            "tipo": "1. Recuerdo seguro (concreta)",
+            "pregunta": "¿Qué parte del cuento 'El Faro de los Inventos de Mateo' con Luna te gustó más imaginar?"
+          },
+          {
+            "tipo": "2. Emoción con causa (perspectiva)",
+            "pregunta": "¿Por qué crees que los personajes se sintieron más tranquilos cuando se escucharon con calma?"
+          },
+          {
+            "tipo": "3. Puente cariñoso al día de hoy",
+            "pregunta": "Si hoy nos pasa algo parecido a lo del cuento, ¿qué idea chiquitita podríamos probar juntos, Mateo?"
+          }
+        ],
+        "escalera_apoyo": "Sin presión: si no tiene ganas de responder, comenta tú primero tu parte favorita en una frase corta y déjalo abierto."
+      },
+      "story_text": "Mateo giró el reloj de arena dorada del Faro de los Inventos y vio caer el primer destello brillante sobre su mesa. A su lado, la Luna saltó ágil con su pelaje barcino para mirar los engranajes de madera que empezaban a moverse. Hoy tenían una misión rápida antes de dormir: alinear el gran telescopio de bronce con los barquitos de papel luminoso del río. Durante la tarde, jugando en el patio con un amigo, los dos habían querido girar la manivela al mismo tiempo y habían tenido un roce chico. Mateo sintió la cara tibia al recordarlo porque él había tirado primero del mango sin esperar su turno. Entonces recordó lo liviano que se siente el pecho cuando uno pide disculpas con cariño y propone contar hasta diez para turnarse. Con dedos seguros, Mateo ajustó la rueda mediana del telescopio y esperó tranquilo a que la arena dorada terminara de bajar. Por el lente apareció el valle silencioso iluminado por estrellitas lentas que flotaban sobre el agua calma. Los barquitos de papel doblaron la curva suave del estero y bajaron sus velas blancas para descansar junto al muelle. Cada movimiento en el faro se fue haciendo más pausado y tibio. Mateo guardó sus engranajes de madera uno por uno dentro de la caja de cedro. La Luna se subió al sillón de terciopelo, apoyó la cabeza en sus patitas y empezó a ronronear suavecito como un motor chiquitito. El murmullo lento del río subía por la ventana e invitaba a bostezar profundo. Mateo apagó su linterna ámbar y se tapó hasta los hombros pensando en los juegos nuevos que armará mañana al despertar, seguro y contento porque en casa te queremos mucho.",
+      "synthesis_elapsed_seconds": 78.3
+    },
+    {
+      "profile_id": "demo_fresia",
+      "child_alias": "Fresia",
+      "age_years": 9,
+      "series_title": "Las Caletas y Puentes del Sur",
+      "role": "Guardiana del Cuaderno de Canciones de Caleta Niebla",
+      "sensory_axes": {
+        "lenguaje": "literario_rico",
+        "estructura": "serie_multiverso",
+        "estimulo_sonoro": "dinamico_a_calmo",
+        "foco_tematico": "rotacion_multiverso"
+      },
+      "voice_id": "catalog-chilena-calida-f1",
+      "voice_display_name": "Narradora Valle Central Cálida (Catálogo Ético es-CL)",
+      "mp3_filename": "demo_fresia_cap1.mp3",
+      "mp3_size_bytes": 3685677,
+      "mp3_sha256": "91fb750feb1f21bb63ff270895a12fb8bb4e4b9ff30d38e796bd9f89463c1c02",
+      "word_count": 558,
+      "readability": {
+        "palabras": 558,
+        "oraciones": 40,
+        "palabras_por_oracion": 13.9,
+        "p90_palabras_oracion": 16,
+        "silabas_por_palabra": 1.97,
+        "fernandez_huerta": 74.2,
+        "szigriszt_pazos": 70.0,
+        "gutierrez_polini": 45.4,
+        "nivel_lectura": "Fácil-Fluido (7-10 años)"
+      },
+      "acoustic_qa": {
+        "whisper_wer": 0.0179,
+        "whisper_accuracy_pct": 98.21,
+        "whisper_similarity": 0.9857,
+        "duration_seconds": 230.3,
+        "words_per_minute": 145.4,
+        "overall_rms_dbfs": -25.03,
+        "opening_quarter_rms_dbfs": -24.53,
+        "closing_quarter_rms_dbfs": -25.54,
+        "sleep_ramp_attenuation_db": 1.01,
+        "spectral_centroid_hz": 2582.8,
+        "blocks_count": 16,
+        "block_repairs_triggered": 0
+      },
+      "parent_guide": {
+        "fundamento": "Conversación compartida opcional de 2 minutos al desayuno (práctica con mayor respaldo en comprensión narrativa e inferencia socioemocional).",
+        "valor_del_capitulo": "Pedir ayuda a la comunidad con confianza",
+        "preguntas": [
+          {
+            "tipo": "1. Recuerdo seguro (concreta)",
+            "pregunta": "¿Qué parte del cuento 'Las Caletas y Puentes del Sur' con Almirante te gustó más imaginar?"
+          },
+          {
+            "tipo": "2. Emoción con causa (perspectiva)",
+            "pregunta": "¿Por qué crees que los personajes se sintieron más tranquilos cuando se escucharon con calma?"
+          },
+          {
+            "tipo": "3. Puente cariñoso al día de hoy",
+            "pregunta": "Si hoy nos pasa algo parecido a lo del cuento, ¿qué idea chiquitita podríamos probar juntos, Fresia?"
+          }
+        ],
+        "escalera_apoyo": "Sin presión: si no tiene ganas de responder, comenta tú primero tu parte favorita en una frase corta y déjalo abierto."
+      },
+      "story_text": "Hoy al caer la tarde sobre Caleta Niebla, una bruma suave cubrió el agua quieta. Los palafitos celestes y amarillos encendieron sus primeras luces tibias junto a la orilla. Fresia se puso su chaleco de lana tejida y salió al balcón de madera. Llevaba en la mano su cuaderno azul y una caracola nacarada en el bolsillo. A su lado caminaba el Almirante, un gato atigrado con media oreja. El gato movía la cola despacio y miraba hacia el muelle con ojos tranquilos. En la isla existía una antigua melodía de tres estrofas muy querida por todos. Los vecinos la tarareaban cada atardecer para guiar a los botes entre la bruma. Hoy Fresia abrió su cuaderno y notó que solo recordaba la primera parte. Fresia sintió una pequeña inquietud en el pecho porque quería ayudar a su tío Lalo. Él volvía desde lejos con sus redes llenas de algas brillantes y necesitaba oír la orilla. El Almirante rozó con la cabeza las botas amarillas de Fresia con mucha calma. Después avanzó sin apuro por la pasarela de tablas hacia la panadería de la señora Rosa. Fresia tocó la puerta de madera tibia y pidió ayuda con total confianza. Preguntó si alguien recordaba cómo seguía la antigua canción del faro. La señora Rosa dejó sobre el mesón una bandeja de tortillas calientes recién horneadas. Sonrió con cariño y cantó despacito la segunda estrofa mientras echaba una pizca de sal. Fresia se sintió muy aliviada porque descubrió que no tenía que saberlo todo sola. Anotó cada palabra con letra clara en las hojas de su cuaderno azul. Luego caminaron juntos por el sendero de conchuelas blancas hasta el taller de don Ramiro. Él tejía cordeles bajo un farol color miel muy tibio. Al oír las dos estrofas, don Ramiro llevó el ritmo con golpecitos suaves en su mesa. Recordó la mitad del último verso, aunque aún faltaban las cuatro notas del final. Entonces el Almirante subió tres peldaños de piedra hacia la torre baja del farero. Allí don Clemente limpiaba el cristal redondo del faro con un paño seco. Don Clemente escuchó a sus vecinos y abrió una sonrisa serena bajo su gorra de lana. Cantó con voz grave las cuatro notas finales, lentas como las olas pequeñas. Entre los cuatro reunieron la canción entera junto a la baranda de madera del muelle. Fresia acercó la caracola nacarada para que el sonido viajara suave sobre el mar quieto. Al oír las voces de su caleta, apareció la lucecita amarilla del bote del tío Lalo. Amarró su cuerda en el poste de madera sin ningún apuro ni tropiezo. Sobre una banca del muelle había quedado doblado un pequeño mapa de papel grueso. Traía dibujado un puente colgante de Quillay Alto como un guiño amable para otro día. De regreso en el palafito celeste, la tetera sonaba bajito sobre la cocina tibia. Afuera el agua seguía meciendo los botes de madera en completa paz. El Almirante se enroscó echado y tranquilo encima de su cojín gris junto a la ventana. Respiraba lento y parejo mientras caía la noche sureña. Fresia dejó su cuaderno con la canción completa sobre el velador de madera. Apagó la lámpara ámbar sintiéndose muy acompañada por el cariño de toda su comunidad. Cerró los ojos esperando los caminos suaves de mañana, sabiendo que tu familia te abraza siempre.",
+      "synthesis_elapsed_seconds": 190.71
+    }
+  ]
+}

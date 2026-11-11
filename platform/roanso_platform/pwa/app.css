@@ -1,0 +1,245 @@
+:root {
+  --bg: #0c1017;
+  --bg-card: #151c28;
+  --bg-elevated: #1e2738;
+  --text: #f5efe6;
+  --text-muted: #9ba8bf;
+  --accent: #f4a261;
+  --accent-soft: rgba(244, 162, 97, 0.16);
+  --ok: #52b788;
+  --ok-soft: rgba(82, 183, 136, 0.15);
+  --danger: #e76f51;
+  --border: rgba(255, 255, 255, 0.1);
+  --story-bg: #101622;
+  --story-text: #f6ede2;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: Georgia, Cambria, "Times New Roman", serif;
+}
+
+body.amber-sleep {
+  --bg: #050301;
+  --bg-card: #0e0904;
+  --bg-elevated: #191007;
+  --text: #e6a15c;
+  --text-muted: #9c6a35;
+  --accent: #d97724;
+  --accent-soft: rgba(217, 119, 36, 0.18);
+  --border: rgba(230, 161, 92, 0.18);
+  --story-bg: #080502;
+  --story-text: #e6a15c;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  line-height: 1.5;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 24px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-icon { width: 42px; height: 42px; border-radius: 12px; }
+.brand h1 { font-size: 1.06rem; font-weight: 700; }
+.brand p { font-size: 0.76rem; color: var(--text-muted); }
+
+.mode-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  background: var(--bg);
+  padding: 4px;
+  border-radius: 11px;
+  border: 1px solid var(--border);
+}
+
+.tab-btn {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tab-btn.active { background: var(--accent); color: #120b04; }
+
+.btn {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  border-radius: 9px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+.btn:hover { border-color: var(--accent); }
+.btn-primary { background: var(--accent); color: #120b04; border-color: var(--accent); }
+.btn-danger { background: rgba(231, 111, 81, 0.16); color: var(--danger); border-color: var(--danger); }
+
+.container { max-width: 1280px; margin: 0 auto; padding: 22px; }
+.pane { display: none; }
+.pane.active { display: block; }
+
+.grid-2col { display: grid; grid-template-columns: 340px 1fr; gap: 22px; }
+.grid-equal { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 920px) {
+  .grid-2col, .grid-equal { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 18px;
+}
+.card h2 {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.archetype-card {
+  padding: 12px 14px;
+  border-radius: 11px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.archetype-card.selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.badge {
+  font-size: 0.73rem;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+}
+.badge.ok { border-color: var(--ok); color: var(--ok); background: var(--ok-soft); }
+.badge.accent { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+.audio-dock {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.audio-dock audio { width: 100%; height: 40px; }
+
+.story-box {
+  background: var(--story-bg);
+  color: var(--story-text);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 26px 30px;
+  font-family: var(--font-serif);
+  font-size: 1.13rem;
+  line-height: 1.82;
+}
+
+.eink-frame {
+  max-width: 500px;
+  margin: 12px auto;
+  background: #2b2d30;
+  border-radius: 24px;
+  padding: 22px;
+  border: 2px solid #3f4247;
+}
+.eink-paper {
+  background: #ece8dc;
+  color: #181715;
+  border-radius: 10px;
+  padding: 22px;
+  font-family: var(--font-serif);
+  font-size: 1.04rem;
+  line-height: 1.72;
+}
+
+/* Modo Niño Nocturno Bloqueado (Cero Luz Azul / Cero Chatbots) */
+.child-bedside-shell {
+  max-width: 560px;
+  margin: 24px auto;
+  text-align: center;
+  padding: 34px 26px;
+  border-radius: 22px;
+  background: #080502;
+  border: 1.5px solid rgba(217, 119, 36, 0.35);
+  color: #e6a15c;
+}
+.giant-play-btn {
+  width: 148px;
+  height: 148px;
+  border-radius: 50%;
+  border: 3px solid #d97724;
+  background: rgba(217, 119, 36, 0.16);
+  color: #f4a261;
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 24px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.field { margin-bottom: 11px; }
+.field label { display: block; font-size: 0.77rem; color: var(--text-muted); margin-bottom: 4px; }
+input, select, textarea {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 0.86rem;
+}
+.status-banner {
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-size: 0.84rem;
+  border: 1px solid var(--ok);
+  background: var(--ok-soft);
+  display: none;
+}
+.q-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 13px;
+  margin-bottom: 8px;
+}
+.q-card strong { display: block; font-size: 0.75rem; color: var(--accent); margin-bottom: 3px; }

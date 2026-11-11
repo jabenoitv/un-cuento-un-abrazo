@@ -1,0 +1,16 @@
+{
+  "name": "un-cuento-un-abrazo-roanso",
+  "version": "1.0.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "Un Cuento, Un Abrazo (ROANSO SpA) — Neuro-inclusive Chilean Spanish bedtime storytelling PWA, Edge CDN showcase, and Ley 21.719 serverless Control Plane.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-netlify.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^11.1.9",
+    "@netlify/database": "^2.0.3",
+    "@netlify/functions": "^6.1.1"
+  }
+}
