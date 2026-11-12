@@ -163,6 +163,9 @@ def test_03_stage_slm_bundle_and_t4_x2_preflight(tmp_path: Path) -> None:
     assert t4_profile["device_map"] == {"": 0}
     assert t4_profile["secondary_eval_device"] == "cuda:1"
 
+    with pytest.raises(RuntimeError, match="Phone Verification"):
+        compute_kaggle_gpu_profile(has_cuda=False, major_cc=0, device_count=0)
+
 
 def test_04_private_voice_actor_kernel_enforces_adult_commercial_contract(tmp_path: Path) -> None:
     staging_dir = tmp_path / "staging_tts"

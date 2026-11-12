@@ -131,7 +131,8 @@ def verify_mounted_ledger_governance(dataset_dir: Path) -> List[Dict[str, str]]:
 def compute_kaggle_gpu_profile(has_cuda: bool, major_cc: int, device_count: int) -> Dict[str, Any]:
     if not has_cuda:
         raise RuntimeError(
-            "No se detectó GPU CUDA activa. En Kaggle activa 'Accelerator: GPU T4 x2' o 'GPU P100'."
+            "No se detectó GPU CUDA activa. Verifica 'Phone Verification' en https://www.kaggle.com/settings "
+            "para desbloquear las 30h/semana de GPU física ('Accelerator: GPU T4 x2' o 'GPU P100')."
         )
     use_bf16 = major_cc >= 8
     return {
