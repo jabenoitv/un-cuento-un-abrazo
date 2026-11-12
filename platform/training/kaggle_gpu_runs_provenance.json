@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0",
+  "cost_usd": 0.0,
+  "runs": {
+    "qwen3_4b": {
+      "base_model": "Qwen/Qwen3-4B",
+      "license": "Apache-2.0",
+      "params_billions": 4.0,
+      "verified_ledger_works": 9,
+      "sft_train_rows": 447,
+      "sft_val_rows": 50,
+      "dpo_rows": 8,
+      "dataset_dir": "/kaggle/input/roanso-corpus-chileno-sft",
+      "training_platform": "Kaggle Notebooks GPU (Offline Air-Gapped Native PyTorch+PEFT)",
+      "quantization_mode": "qlora_nf4_4bit",
+      "mounted_model_path": "/kaggle/input/models/qwen-lm/qwen-3/transformers/4b/1",
+      "gpu_name": "Tesla T4",
+      "gpu_profile": {
+        "device_map": {
+          "": 0
+        },
+        "secondary_eval_device": "cuda:1",
+        "gpu_count": 2,
+        "compute_capability_major": 7,
+        "bf16": false,
+        "fp16": true,
+        "optim": "paged_adamw_8bit",
+        "gradient_checkpointing": true
+      },
+      "sft_train_loss": 2.3335,
+      "sft_val_loss": 2.5125,
+      "dpo_stage": {
+        "executed": true,
+        "dpo_epochs": 3,
+        "mean_dpo_loss": 0.2277
+      },
+      "elapsed_seconds": 1406.66,
+      "smoke_story_preview": "Martín y Sofía se sentaron en una piedra a las 11 de la noche, frente al estero, y comieron un pedazo de pan con un poco de leche. Después de comer, hicieron sus respetivos barquitos de papel y se pusieron a jugar con ellos. Martín hizo primero el barquito del Sol, y Sofía el del Luna. Cuando los barquitos quedaron en el agua, los pusieron en el centro del estero, para ver quién iba más rápido.",
+      "adapter_safetensors_bytes": 132187888,
+      "adapter_safetensors_sha256": "cc8eb21f28cb2a749d95e3106e712b2bc8df2b80d38618cd0c0c6fbe5fc9350c"
+    },
+    "qwen2_5_7b_instruct": {
+      "base_model": "Qwen/Qwen2.5-7B-Instruct",
+      "license": "Apache-2.0",
+      "params_billions": 7.6,
+      "verified_ledger_works": 9,
+      "sft_train_rows": 447,
+      "sft_val_rows": 50,
+      "dpo_rows": 8,
+      "dataset_dir": "/kaggle/input/roanso-corpus-chileno-sft",
+      "training_platform": "Kaggle Notebooks GPU (Offline Air-Gapped Native PyTorch+PEFT)",
+      "quantization_mode": "qlora_nf4_4bit",
+      "mounted_model_path": "/kaggle/input/models/qwen-lm/qwen2.5/transformers/7b-instruct/1",
+      "gpu_name": "Tesla T4",
+      "gpu_profile": {
+        "device_map": {
+          "": 0
+        },
+        "secondary_eval_device": "cuda:1",
+        "gpu_count": 2,
+        "compute_capability_major": 7,
+        "bf16": false,
+        "fp16": true,
+        "optim": "paged_adamw_8bit",
+        "gradient_checkpointing": true
+      },
+      "sft_train_loss": 2.0571,
+      "sft_val_loss": 2.3612,
+      "dpo_stage": {
+        "executed": true,
+        "dpo_epochs": 3,
+        "mean_dpo_loss": 1.0371
+      },
+      "elapsed_seconds": 2294.87,
+      "smoke_story_preview": "El barquito de papel de Martín llevaba una carta para el Rey y la lanzó al viento, que la arrastró hacia el sur. El barquito de papel de Sofía llevaba una carta para la Princesa y la lanzó al viento, que la arrastró hacia el norte. Cuando el sol se puso, los dos amigos se sentaron en el borde del estero a contar las aventuras de sus barquitos de papel.",
+      "adapter_safetensors_bytes": 161533192,
+      "adapter_safetensors_sha256": "6cd46fd04282218e09ff1169f69df7fa0d225b93a7a0a4ba49103002a66df92d"
+    }
+  }
+}
