@@ -44,11 +44,13 @@ KAGGLE_OFFLINE_MODEL_SOURCES: Dict[str, list[str]] = {
 
 
 def ensure_offline_wheels_cached(staging_root: Path) -> Path:
-    """Descarga localmente los 3 wheels Linux Python 3.13 necesarios para entrenar 100% sin Internet en Kaggle."""
+    """Descarga el wheel moderno `bitsandbytes>=0.50` (`cuda118`..`cuda132`) para ejecución sin red en Kaggle."""
     wheels_cache = staging_root / "offline_wheels"
     wheels_cache.mkdir(parents=True, exist_ok=True)
-    if len(list(wheels_cache.glob("*.whl"))) >= 3:
+    if list(wheels_cache.glob("bitsandbytes-0.5*.whl")):
         return wheels_cache
+    for old_whl in wheels_cache.glob("*.whl"):
+        old_whl.unlink()
     subprocess.run(
         [
             sys.executable,
@@ -72,9 +74,7 @@ def ensure_offline_wheels_cached(staging_root: Path) -> Path:
             "cp",
             "--abi",
             "cp313",
-            "bitsandbytes>=0.45.3,<0.47.0",
-            "peft>=0.15.0,<0.17.0",
-            "trl>=0.15.0,<0.18.0",
+            "bitsandbytes>=0.50.0",
         ],
         check=True,
     )

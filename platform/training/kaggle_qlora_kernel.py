@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Kernel Autónomo 100% Offline QLoRA + DPO para Kaggle Notebooks (`GPU T4 x2` / `P100`).
+"""Kernel Autónomo 100% Offline QLoRA + DPO Nativo (PyTorch + PEFT) para Kaggle GPU (`T4 x2`).
 
-Opera de extremo a extremo **sin requerir conexión a Internet** dentro del contenedor GPU de Kaggle:
-1. Instala `bitsandbytes`, `peft` y `trl` desde wheels `.whl` locales incluidos en el dataset privado
-   `/kaggle/input/roanso-corpus-chileno-sft` solo si no vienen preinstalados en la imagen base.
-2. Carga los pesos base `Apache-2.0` (`Qwen2.5-7B-Instruct` o `Qwen3-4B`) directamente desde el montaje
-   NVMe interno de **Kaggle Models Hub** (`model_sources`), en ~8 segundos y sin llamadas de red.
-3. Fija `device_map={"": 0}` y `fp16=True` en GPUs Turing (`sm_75`) y libera VRAM entre `SFT` y `DPO`.
-4. Normaliza `adapter_config.json` al ID canónico de Hugging Face y exporta `roanso-chileno-lora-v1.zip`.
+Diseñado para máxima robustez sobre la imagen 2026 de Kaggle (`Python 3.13` + `transformers 5.x` + `CUDA 12.8/13.x`):
+1. Instala únicamente `bitsandbytes>=0.50.2` (`cuda118`..`cuda132`) desde el wheel offline incluido en
+   `/kaggle/input/roanso-corpus-chileno-sft` (con respaldo automático a `fp16` `device_map="auto"` si no hay bnb).
+2. No depende de `trl` (evitando incompatibilidades con `transformers 5.x`): ejecuta un bucle **SFT con máscara
+   exacta de tokens de asistente** + **DPO exacto (Rafailov et al.) usando `model.disable_adapter()`** sin duplicar VRAM.
+3. Carga `Qwen2.5-7B-Instruct` o `Qwen3-4B` (`Apache-2.0`) desde el montaje NVMe interno de Kaggle (`model_sources`),
+   corre prueba de humo de narración chilena nocturna y empaqueta `/kaggle/working/roanso-chileno-lora-v1.zip`.
 """
 from __future__ import annotations
 
@@ -15,8 +15,8 @@ import argparse
 import csv
 import gc
 import importlib.util
-import inspect
 import json
+import math
 import os
 import shutil
 import subprocess
@@ -41,53 +41,38 @@ def is_kaggle_runtime() -> bool:
     return Path("/kaggle/working").exists() or bool(os.environ.get("KAGGLE_KERNEL_RUN_TYPE"))
 
 
-def ensure_kaggle_ml_dependencies(dataset_dir: Path) -> None:
-    """Instala paquetes faltantes desde wheels locales offline montados en `/kaggle/input`."""
+def ensure_kaggle_ml_dependencies(dataset_dir: Path) -> bool:
+    """Instala `bitsandbytes` moderno (`>=0.50`) desde wheel local si está disponible; retorna si bnb quedó activo."""
     if not is_kaggle_runtime():
-        return
+        return importlib.util.find_spec("bitsandbytes") is not None
+
     os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
     os.environ.setdefault("WANDB_DISABLED", "true")
     os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
-    missing = [pkg for pkg in ("bitsandbytes", "peft", "trl") if importlib.util.find_spec(pkg) is None]
-    if not missing:
-        print("[KAGGLE-DEPS] bitsandbytes, peft y trl ya están preinstalados en la imagen GPU.")
-        return
-
-    wheel_dirs = [dataset_dir, dataset_dir / "wheels"]
+    search_dirs = [dataset_dir, dataset_dir / "wheels"]
     kaggle_in = Path("/kaggle/input")
     if kaggle_in.exists():
-        for whl in kaggle_in.rglob("*.whl"):
-            if whl.parent not in wheel_dirs:
-                wheel_dirs.append(whl.parent)
+        for whl in kaggle_in.rglob("bitsandbytes-*.whl"):
+            if whl.parent not in search_dirs:
+                search_dirs.append(whl.parent)
 
-    local_wheels: List[str] = []
-    for pkg in missing:
-        matched = None
-        for wd in wheel_dirs:
-            if wd.exists():
-                found = sorted(wd.glob(f"{pkg}-*.whl"))
-                if found:
-                    matched = str(found[-1])
-                    break
-        if matched:
-            local_wheels.append(matched)
+    for wd in search_dirs:
+        if wd.exists():
+            bnb_wheels = sorted(wd.glob("bitsandbytes-*.whl"))
+            if bnb_wheels:
+                target_whl = str(bnb_wheels[-1])
+                print(f"[KAGGLE-DEPS] Instalando wheel offline CUDA moderno: {target_whl}")
+                subprocess.run(
+                    [sys.executable, "-m", "pip", "install", "-q", "--no-index", "--no-deps", "--force-reinstall", target_whl],
+                    check=True,
+                )
+                return True
 
-    if len(local_wheels) == len(missing):
-        print(f"[KAGGLE-DEPS] Instalando wheels offline para {missing}: {local_wheels}")
-        subprocess.run(
-            [sys.executable, "-m", "pip", "install", "-q", "--no-index", "--no-deps", *local_wheels],
-            check=True,
-        )
-        return
-
-    raise FileNotFoundError(
-        f"Faltan paquetes {missing} y no se hallaron sus wheels `.whl` offline en {dataset_dir}."
-    )
+    return importlib.util.find_spec("bitsandbytes") is not None
 
 
 def locate_mounted_dataset(explicit_dir: str | None = None) -> Path:
-    """Localiza el dataset ROANSO ya sea por ruta explícita o escaneando `/kaggle/input/*`."""
     if explicit_dir:
         candidate = Path(explicit_dir).resolve()
         if (candidate / "sft_train_chileno.jsonl").exists():
@@ -102,7 +87,6 @@ def locate_mounted_dataset(explicit_dir: str | None = None) -> Path:
 
 
 def resolve_base_model_path_or_id(base_model: str) -> tuple[str, bool]:
-    """Resuelve montaje NVMe local en `/kaggle/input` (`model_sources`) para operar 100% sin red."""
     kaggle_input = Path("/kaggle/input")
     if not kaggle_input.exists():
         return base_model, False
@@ -124,7 +108,6 @@ def resolve_base_model_path_or_id(base_model: str) -> tuple[str, bool]:
 
 
 def verify_mounted_ledger_governance(dataset_dir: Path) -> List[Dict[str, str]]:
-    """Valida reglas legales comerciales y humanas en `licencias_corpus.csv` dentro del nodo GPU."""
     ledger_path = dataset_dir / "licencias_corpus.csv"
     if not ledger_path.exists():
         raise FileNotFoundError(f"Falta `licencias_corpus.csv` obligatorio en {dataset_dir}")
@@ -146,7 +129,6 @@ def verify_mounted_ledger_governance(dataset_dir: Path) -> List[Dict[str, str]]:
 
 
 def compute_kaggle_gpu_profile(has_cuda: bool, major_cc: int, device_count: int) -> Dict[str, Any]:
-    """Calcula perfil óptimo para Tesla T4 (`sm_75`, sin `bf16` nativo) vs Ampere+ (`sm_80+`)."""
     if not has_cuda:
         raise RuntimeError(
             "No se detectó GPU CUDA activa. En Kaggle activa 'Accelerator: GPU T4 x2' o 'GPU P100'."
@@ -164,11 +146,40 @@ def compute_kaggle_gpu_profile(has_cuda: bool, major_cc: int, device_count: int)
     }
 
 
-def _filter_supported_kwargs(cls: Any, desired: Dict[str, Any]) -> Dict[str, Any]:
-    sig_params = inspect.signature(cls.__init__).parameters
-    if any(p.kind == inspect.Parameter.VAR_KEYWORD for p in sig_params.values()):
-        return desired
-    return {k: v for k, v in desired.items() if k in sig_params}
+def _apply_chat(tokenizer: Any, messages: List[Dict[str, str]], add_generation_prompt: bool, base_model: str) -> str:
+    kwargs: Dict[str, Any] = {"tokenize": False, "add_generation_prompt": add_generation_prompt}
+    if "Qwen3" in base_model:
+        kwargs["enable_thinking"] = False
+    try:
+        return tokenizer.apply_chat_template(messages, **kwargs)
+    except TypeError:
+        return tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=add_generation_prompt)
+
+
+def _encode_sft_record(tokenizer: Any, messages: List[Dict[str, str]], max_len: int, base_model: str) -> Dict[str, List[int]]:
+    prompt_msgs = messages[:-1]
+    full_text = _apply_chat(tokenizer, messages, add_generation_prompt=False, base_model=base_model)
+    prompt_text = _apply_chat(tokenizer, prompt_msgs, add_generation_prompt=True, base_model=base_model)
+
+    full_ids = tokenizer(full_text, truncation=True, max_length=max_len, add_special_tokens=False)["input_ids"]
+    prompt_ids = tokenizer(prompt_text, truncation=True, max_length=max_len, add_special_tokens=False)["input_ids"]
+
+    prompt_len = min(len(prompt_ids), max(0, len(full_ids) - 1))
+    labels = [-100] * prompt_len + full_ids[prompt_len:]
+    return {"input_ids": full_ids, "labels": labels}
+
+
+def _sequence_logprob(model: Any, input_ids_1d: List[int], prompt_len: int, device: Any) -> Any:
+    import torch
+    import torch.nn.functional as F
+
+    x = torch.tensor([input_ids_1d], dtype=torch.long, device=device)
+    logits = model(input_ids=x).logits[:, :-1, :]
+    targets = x[:, 1:]
+    log_probs = F.log_softmax(logits.float(), dim=-1)
+    token_lp = log_probs.gather(dim=-1, index=targets.unsqueeze(-1)).squeeze(-1)
+    start_idx = max(0, prompt_len - 1)
+    return token_lp[:, start_idx:].sum(dim=-1).squeeze(0)
 
 
 def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
@@ -186,12 +197,12 @@ def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
     val_jsonl = dataset_dir / "sft_val_chileno.jsonl"
     dpo_jsonl = dataset_dir / "dpo_preferencias_chilenas.jsonl"
 
-    train_count = sum(1 for ln in train_jsonl.read_text(encoding="utf-8").splitlines() if ln.strip())
-    val_count = sum(1 for ln in val_jsonl.read_text(encoding="utf-8").splitlines() if ln.strip())
-    dpo_count = (
-        sum(1 for ln in dpo_jsonl.read_text(encoding="utf-8").splitlines() if ln.strip())
+    train_rows = [json.loads(ln) for ln in train_jsonl.read_text(encoding="utf-8").splitlines() if ln.strip()]
+    val_rows = [json.loads(ln) for ln in val_jsonl.read_text(encoding="utf-8").splitlines() if ln.strip()]
+    dpo_rows = (
+        [json.loads(ln) for ln in dpo_jsonl.read_text(encoding="utf-8").splitlines() if ln.strip()]
         if dpo_jsonl.exists()
-        else 0
+        else []
     )
 
     preflight_summary = {
@@ -199,25 +210,25 @@ def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
         "license": "Apache-2.0",
         "params_billions": params_b,
         "verified_ledger_works": len(verified_rows),
-        "sft_train_rows": train_count,
-        "sft_val_rows": val_count,
-        "dpo_rows": dpo_count,
+        "sft_train_rows": len(train_rows),
+        "sft_val_rows": len(val_rows),
+        "dpo_rows": len(dpo_rows),
         "dataset_dir": str(dataset_dir),
     }
     print(f"[KAGGLE-PREFLIGHT-OK] {json.dumps(preflight_summary, ensure_ascii=False)}")
     if args.verify_only:
         return preflight_summary
 
-    ensure_kaggle_ml_dependencies(dataset_dir)
+    has_bnb = ensure_kaggle_ml_dependencies(dataset_dir)
     resolved_model_path, is_offline_mount = resolve_base_model_path_or_id(args.base_model)
-    print(f"[KAGGLE-MODEL] Fuente pesos='{resolved_model_path}' (offline_nvme={is_offline_mount})")
+    print(f"[KAGGLE-MODEL] Fuente pesos='{resolved_model_path}' (offline_nvme={is_offline_mount}, bnb={has_bnb})")
     t0 = time.time()
 
+    import random
     import torch
-    from datasets import load_dataset
-    from peft import LoraConfig, PeftModel
-    from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
-    from trl import DPOConfig, DPOTrainer, SFTConfig, SFTTrainer
+    import torch.nn.functional as F
+    from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
+    from transformers import AutoModelForCausalLM, AutoTokenizer
 
     has_cuda = torch.cuda.is_available()
     major_cc = torch.cuda.get_device_capability(0)[0] if has_cuda else 0
@@ -227,26 +238,47 @@ def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
         device_count=torch.cuda.device_count() if has_cuda else 0,
     )
     gpu_name = torch.cuda.get_device_name(0)
-    print(f"[KAGGLE-GPU] Detectada '{gpu_name}' (GPUs={gpu_profile['gpu_count']}, perfil={gpu_profile})")
-
     compute_dtype = torch.bfloat16 if gpu_profile["bf16"] else torch.float16
-    bnb_cfg = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=compute_dtype,
-        bnb_4bit_use_double_quant=True,
-    )
+    print(f"[KAGGLE-GPU] Detectada '{gpu_name}' (GPUs={gpu_profile['gpu_count']}, perfil={gpu_profile})")
 
     tokenizer = AutoTokenizer.from_pretrained(resolved_model_path, local_files_only=is_offline_mount)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    model = AutoModelForCausalLM.from_pretrained(
-        resolved_model_path,
-        quantization_config=bnb_cfg,
-        device_map=gpu_profile["device_map"],
-        local_files_only=is_offline_mount,
-    )
+    quant_mode = "fp16_sharded"
+    model = None
+    if has_bnb:
+        try:
+            from transformers import BitsAndBytesConfig
+
+            bnb_cfg = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_quant_type="nf4",
+                bnb_4bit_compute_dtype=compute_dtype,
+                bnb_4bit_use_double_quant=True,
+            )
+            model = AutoModelForCausalLM.from_pretrained(
+                resolved_model_path,
+                quantization_config=bnb_cfg,
+                device_map=gpu_profile["device_map"],
+                local_files_only=is_offline_mount,
+            )
+            model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True)
+            quant_mode = "qlora_nf4_4bit"
+        except Exception as bnb_err:
+            print(f"[KAGGLE-WARN] 4-bit NF4 no disponible ({bnb_err}); activando respaldo nativo fp16.")
+            model = None
+
+    if model is None:
+        model = AutoModelForCausalLM.from_pretrained(
+            resolved_model_path,
+            torch_dtype=compute_dtype,
+            device_map="auto",
+            local_files_only=is_offline_mount,
+        )
+        model.gradient_checkpointing_enable()
+        model.enable_input_require_grads()
+
     model.config.use_cache = False
 
     peft_cfg = LoraConfig(
@@ -257,112 +289,148 @@ def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
         task_type="CAUSAL_LM",
         target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
     )
+    model = get_peft_model(model, peft_cfg)
+    model.print_trainable_parameters()
 
-    ds = load_dataset(
-        "json",
-        data_files={"train": str(train_jsonl), "validation": str(val_jsonl)},
-    )
+    encoded_train = [_encode_sft_record(tokenizer, r["messages"], 1024, args.base_model) for r in train_rows]
+    encoded_val = [_encode_sft_record(tokenizer, r["messages"], 1024, args.base_model) for r in val_rows]
+
+    trainable_params = [p for p in model.parameters() if p.requires_grad]
+    optimizer = torch.optim.AdamW(trainable_params, lr=2e-4, weight_decay=0.01)
+
+    total_micro_steps = args.epochs * len(encoded_train)
+    total_opt_steps = max(1, math.ceil(total_micro_steps / args.grad_accum))
+    warmup_steps = max(2, int(0.08 * total_opt_steps))
+
+    def lr_lambda(step: int) -> float:
+        if step < warmup_steps:
+            return float(step + 1) / float(warmup_steps)
+        progress = float(step - warmup_steps) / float(max(1, total_opt_steps - warmup_steps))
+        return max(0.1, 0.5 * (1.0 + math.cos(math.pi * progress)))
+
+    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
+    scaler = torch.amp.GradScaler("cuda", enabled=gpu_profile["fp16"])
+    first_device = next(model.parameters()).device
+    amp_dtype = torch.bfloat16 if gpu_profile["bf16"] else torch.float16
+
+    rng = random.Random(42)
+    running_losses: List[float] = []
+    opt_step = 0
+    model.train()
+    optimizer.zero_grad(set_to_none=True)
+
+    for epoch in range(args.epochs):
+        indices = list(range(len(encoded_train)))
+        rng.shuffle(indices)
+        epoch_losses: List[float] = []
+        for idx_pos, sample_idx in enumerate(indices, start=1):
+            rec = encoded_train[sample_idx]
+            inp = torch.tensor([rec["input_ids"]], dtype=torch.long, device=first_device)
+            lbl = torch.tensor([rec["labels"]], dtype=torch.long, device=first_device)
+
+            with torch.amp.autocast("cuda", dtype=amp_dtype):
+                out = model(input_ids=inp, labels=lbl)
+                loss = out.loss / args.grad_accum
+
+            scaler.scale(loss).backward()
+            raw_loss = float(out.loss.detach().cpu())
+            running_losses.append(raw_loss)
+            epoch_losses.append(raw_loss)
+
+            if idx_pos % args.grad_accum == 0 or idx_pos == len(indices):
+                scaler.unscale_(optimizer)
+                torch.nn.utils.clip_grad_norm_(trainable_params, 1.0)
+                scaler.step(optimizer)
+                scaler.update()
+                optimizer.zero_grad(set_to_none=True)
+                scheduler.step()
+                opt_step += 1
+
+        # Evaluación en validación al cierre de cada época
+        model.eval()
+        val_losses: List[float] = []
+        with torch.no_grad():
+            for vrec in encoded_val:
+                vinp = torch.tensor([vrec["input_ids"]], dtype=torch.long, device=first_device)
+                vlbl = torch.tensor([vrec["labels"]], dtype=torch.long, device=first_device)
+                with torch.amp.autocast("cuda", dtype=amp_dtype):
+                    vloss = model(input_ids=vinp, labels=vlbl).loss
+                val_losses.append(float(vloss.detach().cpu()))
+        mean_train = round(sum(epoch_losses) / max(1, len(epoch_losses)), 4)
+        mean_val = round(sum(val_losses) / max(1, len(val_losses)), 4)
+        print(f"[KAGGLE-SFT] Época {epoch + 1}/{args.epochs} · train_loss={mean_train} · val_loss={mean_val}")
+        model.train()
+
+    sft_loss = round(sum(running_losses) / max(1, len(running_losses)), 4)
+    val_final_loss = mean_val
+
+    # Etapa 2: DPO exacto usando `model.disable_adapter()` como referencia congelada sin duplicar VRAM
+    dpo_metrics: Dict[str, Any] = {"executed": False}
+    if args.run_dpo and dpo_rows:
+        print(f"[KAGGLE-DPO] Refinando {len(dpo_rows)} pares chilenos de Diseño Universal...")
+        dpo_opt = torch.optim.AdamW(trainable_params, lr=5e-5, weight_decay=0.0)
+        dpo_losses: List[float] = []
+        sys_dpo = (
+            "Eres un narrador chileno cálido de 'Un Cuento, Un Abrazo'. Escribes en 3ª persona, "
+            "sin etiquetas clínicas ni moralejas, mostrando emociones e intenciones reales."
+        )
+        for _dpo_epoch in range(3):
+            for pair in dpo_rows:
+                p_msgs = [{"role": "system", "content": sys_dpo}, {"role": "user", "content": pair["prompt"]}]
+                c_msgs = p_msgs + [{"role": "assistant", "content": pair["chosen"]}]
+                r_msgs = p_msgs + [{"role": "assistant", "content": pair["rejected"]}]
+
+                p_ids = tokenizer(
+                    _apply_chat(tokenizer, p_msgs, True, args.base_model),
+                    truncation=True,
+                    max_length=384,
+                    add_special_tokens=False,
+                )["input_ids"]
+                c_ids = tokenizer(
+                    _apply_chat(tokenizer, c_msgs, False, args.base_model),
+                    truncation=True,
+                    max_length=768,
+                    add_special_tokens=False,
+                )["input_ids"]
+                r_ids = tokenizer(
+                    _apply_chat(tokenizer, r_msgs, False, args.base_model),
+                    truncation=True,
+                    max_length=768,
+                    add_special_tokens=False,
+                )["input_ids"]
+                plen = len(p_ids)
+
+                with torch.no_grad(), model.disable_adapter():
+                    with torch.amp.autocast("cuda", dtype=amp_dtype):
+                        ref_c = _sequence_logprob(model, c_ids, plen, first_device)
+                        ref_r = _sequence_logprob(model, r_ids, plen, first_device)
+
+                dpo_opt.zero_grad(set_to_none=True)
+                with torch.amp.autocast("cuda", dtype=amp_dtype):
+                    pi_c = _sequence_logprob(model, c_ids, plen, first_device)
+                    pi_r = _sequence_logprob(model, r_ids, plen, first_device)
+                    logits_diff = (pi_c - ref_c) - (pi_r - ref_r)
+                    dpo_loss = -F.logsigmoid(0.1 * logits_diff)
+
+                scaler.scale(dpo_loss).backward()
+                scaler.unscale_(dpo_opt)
+                torch.nn.utils.clip_grad_norm_(trainable_params, 1.0)
+                scaler.step(dpo_opt)
+                scaler.update()
+                dpo_losses.append(float(dpo_loss.detach().cpu()))
+
+        dpo_metrics = {
+            "executed": True,
+            "dpo_epochs": 3,
+            "mean_dpo_loss": round(sum(dpo_losses) / max(1, len(dpo_losses)), 4),
+        }
+        print(f"[KAGGLE-DPO-OK] {dpo_metrics}")
 
     output_dir = Path(args.output_dir).resolve()
-    sft_stage_dir = output_dir / "sft_checkpoint" if (args.run_dpo and dpo_count > 0) else output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
+    model.save_pretrained(str(output_dir))
+    tokenizer.save_pretrained(str(output_dir))
 
-    sft_sig = inspect.signature(SFTConfig.__init__).parameters
-    sft_raw_kwargs: Dict[str, Any] = {
-        "output_dir": str(sft_stage_dir),
-        "num_train_epochs": args.epochs,
-        "per_device_train_batch_size": args.batch_size,
-        "gradient_accumulation_steps": args.grad_accum,
-        "learning_rate": 2e-4,
-        "lr_scheduler_type": "cosine",
-        "warmup_steps": 10,
-        "logging_steps": 10,
-        "save_strategy": "epoch",
-        "bf16": gpu_profile["bf16"],
-        "fp16": gpu_profile["fp16"],
-        "gradient_checkpointing": True,
-        "optim": gpu_profile["optim"],
-        "report_to": "none",
-    }
-    if "max_length" in sft_sig:
-        sft_raw_kwargs["max_length"] = 1280
-    elif "max_seq_length" in sft_sig:
-        sft_raw_kwargs["max_seq_length"] = 1280
-    if "eval_strategy" in sft_sig:
-        sft_raw_kwargs["eval_strategy"] = "epoch"
-    elif "evaluation_strategy" in sft_sig:
-        sft_raw_kwargs["evaluation_strategy"] = "epoch"
-
-    sft_cfg = SFTConfig(**_filter_supported_kwargs(SFTConfig, sft_raw_kwargs))
-
-    sft_trainer = SFTTrainer(
-        model=model,
-        processing_class=tokenizer,
-        train_dataset=ds["train"],
-        eval_dataset=ds["validation"],
-        peft_config=peft_cfg,
-        args=sft_cfg,
-    )
-    sft_result = sft_trainer.train()
-    sft_loss = float(sft_result.training_loss)
-    sft_trainer.save_model(str(sft_stage_dir))
-    tokenizer.save_pretrained(str(sft_stage_dir))
-
-    # Libera estados del optimizador SFT antes de iniciar DPO / inferencia en T4 16GB
-    del sft_trainer
-    del model
-    gc.collect()
-    torch.cuda.empty_cache()
-
-    dpo_metrics: Dict[str, Any] = {"executed": False}
-    base_post = AutoModelForCausalLM.from_pretrained(
-        resolved_model_path,
-        quantization_config=bnb_cfg,
-        device_map=gpu_profile["device_map"],
-        local_files_only=is_offline_mount,
-    )
-    base_post.config.use_cache = False
-    active_model = PeftModel.from_pretrained(
-        base_post,
-        str(sft_stage_dir),
-        is_trainable=bool(args.run_dpo and dpo_count > 0),
-    )
-
-    if args.run_dpo and dpo_count > 0:
-        print(f"[KAGGLE-DPO] Refinando {dpo_count} pares chilenos de Diseño Universal...")
-        dpo_ds = load_dataset("json", data_files={"train": str(dpo_jsonl)})["train"]
-        dpo_raw_kwargs: Dict[str, Any] = {
-            "output_dir": str(output_dir),
-            "num_train_epochs": 2,
-            "per_device_train_batch_size": 1,
-            "gradient_accumulation_steps": 4,
-            "learning_rate": 5e-5,
-            "beta": 0.1,
-            "max_length": 768,
-            "max_prompt_length": 256,
-            "bf16": gpu_profile["bf16"],
-            "fp16": gpu_profile["fp16"],
-            "gradient_checkpointing": True,
-            "optim": gpu_profile["optim"],
-            "logging_steps": 2,
-            "save_strategy": "no",
-            "report_to": "none",
-        }
-        dpo_cfg = DPOConfig(**_filter_supported_kwargs(DPOConfig, dpo_raw_kwargs))
-        dpo_trainer = DPOTrainer(
-            model=active_model,
-            ref_model=None,
-            args=dpo_cfg,
-            train_dataset=dpo_ds,
-            processing_class=tokenizer,
-        )
-        dpo_res = dpo_trainer.train()
-        dpo_trainer.save_model(str(output_dir))
-        tokenizer.save_pretrained(str(output_dir))
-        dpo_metrics = {"executed": True, "train_loss": float(dpo_res.training_loss)}
-        active_model = dpo_trainer.model
-
-    # Normaliza `base_model_name_or_path` en `adapter_config.json` al ID canónico de Hugging Face
     adapter_cfg_path = output_dir / "adapter_config.json"
     if adapter_cfg_path.exists():
         acfg = json.loads(adapter_cfg_path.read_text(encoding="utf-8"))
@@ -373,7 +441,7 @@ def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
     if modelfile_src.exists():
         shutil.copy2(modelfile_src, output_dir / "Modelfile.roanso-chileno")
 
-    # Prueba de humo de generación cálida chilena en inferencia
+    # Prueba de humo de generación cálida chilena en inferencia real
     smoke_prompt = [
         {
             "role": "system",
@@ -390,31 +458,27 @@ def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
             ),
         },
     ]
-    template_kwargs: Dict[str, Any] = {"tokenize": False, "add_generation_prompt": True}
-    if "Qwen3" in args.base_model:
-        template_kwargs["enable_thinking"] = False
-    try:
-        rendered = tokenizer.apply_chat_template(smoke_prompt, **template_kwargs)
-    except TypeError:
-        rendered = tokenizer.apply_chat_template(smoke_prompt, tokenize=False, add_generation_prompt=True)
-
-    inputs = tokenizer(rendered, return_tensors="pt").to("cuda:0")
-    active_model.eval()
-    with torch.no_grad():
-        gen_ids = active_model.generate(**inputs, max_new_tokens=180, temperature=0.55, do_sample=True)
+    rendered = _apply_chat(tokenizer, smoke_prompt, add_generation_prompt=True, base_model=args.base_model)
+    inputs = tokenizer(rendered, return_tensors="pt").to(first_device)
+    model.eval()
+    model.config.use_cache = True
+    with torch.no_grad(), torch.amp.autocast("cuda", dtype=amp_dtype):
+        gen_ids = model.generate(**inputs, max_new_tokens=180, temperature=0.55, do_sample=True)
     sample_story = tokenizer.decode(gen_ids[0][inputs["input_ids"].shape[1] :], skip_special_tokens=True).strip()
 
-    if sft_stage_dir != output_dir and sft_stage_dir.exists():
-        shutil.rmtree(sft_stage_dir, ignore_errors=True)
+    gc.collect()
+    torch.cuda.empty_cache()
 
     elapsed_s = round(time.time() - t0, 2)
     audit_payload = {
         **preflight_summary,
-        "training_platform": "Kaggle Notebooks GPU (Offline Air-Gapped)",
+        "training_platform": "Kaggle Notebooks GPU (Offline Air-Gapped Native PyTorch+PEFT)",
+        "quantization_mode": quant_mode,
         "mounted_model_path": resolved_model_path,
         "gpu_name": gpu_name,
         "gpu_profile": gpu_profile,
         "sft_train_loss": sft_loss,
+        "sft_val_loss": val_final_loss,
         "dpo_stage": dpo_metrics,
         "elapsed_seconds": elapsed_s,
         "smoke_story_preview": sample_story,
@@ -440,9 +504,9 @@ def main() -> None:
     parser.add_argument("--base-model", default=DEFAULT_BASE_MODEL)
     parser.add_argument("--dataset-dir", default=None)
     parser.add_argument("--output-dir", default=default_out)
-    parser.add_argument("--epochs", type=int, default=3)
-    parser.add_argument("--batch-size", type=int, default=2)
-    parser.add_argument("--grad-accum", type=int, default=4)
+    parser.add_argument("--epochs", type=int, default=2)
+    parser.add_argument("--batch-size", type=int, default=1)
+    parser.add_argument("--grad-accum", type=int, default=8)
     parser.add_argument("--lora-r", type=int, default=16)
     parser.add_argument("--lora-alpha", type=int, default=32)
     parser.add_argument("--run-dpo", action="store_true", default=True)
