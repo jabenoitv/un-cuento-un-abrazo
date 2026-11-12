@@ -16,6 +16,7 @@ import argparse
 import json
 import os
 import shutil
+import subprocess
 import sys
 import time
 from dataclasses import dataclass
@@ -35,6 +36,49 @@ ROANSO_REQUIRED_SLUG_PREFIX = "roanso-"
 DEFAULT_SLM_DATASET_SLUG = "roanso-corpus-chileno-sft"
 DEFAULT_SLM_KERNEL_SLUG = "roanso-qlora-qwen2-5-7b-chileno-v1"
 DEFAULT_TTS_KERNEL_SLUG = "roanso-tts-voces-chile-v1"
+
+KAGGLE_OFFLINE_MODEL_SOURCES: Dict[str, list[str]] = {
+    "Qwen/Qwen2.5-7B-Instruct": ["qwen-lm/qwen2.5/transformers/7b-instruct/1"],
+    "Qwen/Qwen3-4B": ["qwen-lm/qwen-3/transformers/4b/1"],
+}
+
+
+def ensure_offline_wheels_cached(staging_root: Path) -> Path:
+    """Descarga localmente los 3 wheels Linux Python 3.13 necesarios para entrenar 100% sin Internet en Kaggle."""
+    wheels_cache = staging_root / "offline_wheels"
+    wheels_cache.mkdir(parents=True, exist_ok=True)
+    if len(list(wheels_cache.glob("*.whl"))) >= 3:
+        return wheels_cache
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "download",
+            "-q",
+            "--dest",
+            str(wheels_cache),
+            "--only-binary=:all:",
+            "--no-deps",
+            "--platform",
+            "manylinux_2_28_x86_64",
+            "--platform",
+            "manylinux_2_24_x86_64",
+            "--platform",
+            "manylinux2014_x86_64",
+            "--python-version",
+            "313",
+            "--implementation",
+            "cp",
+            "--abi",
+            "cp313",
+            "bitsandbytes>=0.45.3,<0.47.0",
+            "peft>=0.15.0,<0.17.0",
+            "trl>=0.15.0,<0.18.0",
+        ],
+        check=True,
+    )
+    return wheels_cache
 
 
 @dataclass(frozen=True)
@@ -137,6 +181,11 @@ def stage_slm_kaggle_bundle(
     if (corpus_dir / "CREDITOS_LICENCIAS.md").exists():
         shutil.copy2(corpus_dir / "CREDITOS_LICENCIAS.md", ds_dir / "CREDITOS_LICENCIAS.md")
 
+    wheels_cache = staging_root / "offline_wheels"
+    if wheels_cache.exists():
+        for whl_file in wheels_cache.glob("*.whl"):
+            shutil.copy2(whl_file, ds_dir / whl_file.name)
+
     dataset_meta = {
         "title": safe_ds_slug.replace("-", " ").title(),
         "id": f"{kaggle_username}/{safe_ds_slug}",
@@ -156,6 +205,7 @@ def stage_slm_kaggle_bundle(
     (kn_dir / "kaggle_qlora_kernel.py").write_text(kernel_code, encoding="utf-8")
 
     resolved_title = kernel_title or safe_kn_slug.replace("-", " ").title()
+    offline_models = KAGGLE_OFFLINE_MODEL_SOURCES.get(base_model, [])
     kernel_meta = {
         "id": f"{kaggle_username}/{safe_kn_slug}",
         "title": resolved_title,
@@ -165,11 +215,11 @@ def stage_slm_kaggle_bundle(
         "is_private": True,
         "enable_gpu": True,
         "enable_tpu": False,
-        "enable_internet": True,
+        "enable_internet": len(offline_models) == 0,
         "dataset_sources": [f"{kaggle_username}/{safe_ds_slug}"],
         "competition_sources": [],
         "kernel_sources": [],
-        "model_sources": [],
+        "model_sources": offline_models,
     }
     (kn_dir / "kernel-metadata.json").write_text(
         json.dumps(kernel_meta, ensure_ascii=False, indent=2),
@@ -250,6 +300,8 @@ def push_slm_to_kaggle(
     safe_kn_slug = assert_safe_roanso_slug(kernel_slug)
     api, creds = get_authenticated_kaggle_api(kaggle_json_path=kaggle_json_path)
     owner = resolve_authenticated_owner(api, creds.username)
+    if not skip_dataset_upload:
+        ensure_offline_wheels_cached(staging_root)
 
     staged = stage_slm_kaggle_bundle(
         corpus_dir=corpus_dir,
@@ -269,7 +321,7 @@ def push_slm_to_kaggle(
         if target_ds_ref in existing_ds_refs:
             api.dataset_create_version(
                 staged["dataset_dir"],
-                version_notes="Actualizacion corpus auditado SHA-256 y pares DPO chilenos",
+                version_notes="Corpus SHA-256 + DPO Diseno Universal + Wheels Offline Py313",
                 quiet=True,
                 convert_to_csv=False,
             )
@@ -282,7 +334,7 @@ def push_slm_to_kaggle(
                 convert_to_csv=False,
             )
             ds_action = "created_private"
-        time.sleep(10)
+        time.sleep(20)
 
     push_res = api.kernels_push(staged["kernel_dir"])
     err_msg = getattr(push_res, "error", None)

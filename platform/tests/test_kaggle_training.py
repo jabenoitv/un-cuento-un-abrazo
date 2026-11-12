@@ -134,7 +134,9 @@ def test_03_stage_slm_bundle_and_t4_x2_preflight(tmp_path: Path) -> None:
     assert ds_meta["isPrivate"] is True
     assert kn_meta["is_private"] is True
     assert kn_meta["enable_gpu"] is True
+    assert kn_meta["enable_internet"] is False
     assert kn_meta["dataset_sources"] == ["roanso_lab/roanso-corpus-chileno-sft"]
+    assert kn_meta["model_sources"] == ["qwen-lm/qwen2.5/transformers/7b-instruct/1"]
 
     # Verifica preflight del kernel QLoRA sobre el dataset empaquetado
     preflight = run_kaggle_qlora_pipeline(

@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
-"""Kernel Autónomo de Entrenamiento QLoRA + DPO para Kaggle Notebooks (`GPU T4 x2` / `P100`).
+"""Kernel Autónomo 100% Offline QLoRA + DPO para Kaggle Notebooks (`GPU T4 x2` / `P100`).
 
-Diseñado específicamente para correr sin costo dentro de la cuota gratuita de **Kaggle GPU**
-(`2x NVIDIA Tesla T4 16 GB = 32 GB VRAM`, arquitectura Turing `sm_75`):
-1. Instala versiones compatibles de `bitsandbytes`, `peft`, `trl`, `transformers` y `accelerate` sin reinstalar `torch`.
-2. Descubre el dataset privado montado en `/kaggle/input/roanso-cuentos-chileno-sft-v1` y audita `licencias_corpus.csv`
-   (bloqueando licencias no comerciales/virales o corpus sintéticos antes de inicializar CUDA).
-3. Fija `device_map={"": 0}` y `fp16=True` en GPUs Turing (`sm_75`) para evitar choques multi-GPU en `Trainer`,
-   y libera explícitamente VRAM entre Etapa 1 (`SFT`) y Etapa 2 (`DPO`) para mantenerse bajo ~9.5 GB de VRAM.
-4. Ejecuta Etapa 1 (`SFT` sobre pasajes literarios humanos) + Etapa 2 (`DPO` sobre preferencias chilenas y Diseño Universal)
-   + prueba de humo nocturna y empaqueta `/kaggle/working/roanso-chileno-lora-v1.zip` (`Apache-2.0`).
+Opera de extremo a extremo **sin requerir conexión a Internet** dentro del contenedor GPU de Kaggle:
+1. Instala `bitsandbytes`, `peft` y `trl` desde wheels `.whl` locales incluidos en el dataset privado
+   `/kaggle/input/roanso-corpus-chileno-sft` solo si no vienen preinstalados en la imagen base.
+2. Carga los pesos base `Apache-2.0` (`Qwen2.5-7B-Instruct` o `Qwen3-4B`) directamente desde el montaje
+   NVMe interno de **Kaggle Models Hub** (`model_sources`), en ~8 segundos y sin llamadas de red.
+3. Fija `device_map={"": 0}` y `fp16=True` en GPUs Turing (`sm_75`) y libera VRAM entre `SFT` y `DPO`.
+4. Normaliza `adapter_config.json` al ID canónico de Hugging Face y exporta `roanso-chileno-lora-v1.zip`.
 """
 from __future__ import annotations
 
 import argparse
 import csv
 import gc
+import importlib.util
 import inspect
 import json
 import os
@@ -42,23 +41,48 @@ def is_kaggle_runtime() -> bool:
     return Path("/kaggle/working").exists() or bool(os.environ.get("KAGGLE_KERNEL_RUN_TYPE"))
 
 
-def ensure_kaggle_ml_dependencies() -> None:
-    """Instala dependencias QLoRA compatibles sin reinstalar el wheel CUDA de `torch` de Kaggle."""
+def ensure_kaggle_ml_dependencies(dataset_dir: Path) -> None:
+    """Instala paquetes faltantes desde wheels locales offline montados en `/kaggle/input`."""
     if not is_kaggle_runtime():
         return
     os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
     os.environ.setdefault("WANDB_DISABLED", "true")
-    pkgs = [
-        "transformers>=4.51.0",
-        "bitsandbytes>=0.45.3",
-        "peft>=0.14.0",
-        "trl>=0.15.0",
-        "accelerate>=1.2.0",
-        "datasets>=3.2.0",
-    ]
-    subprocess.run(
-        [sys.executable, "-m", "pip", "install", "-q", "--upgrade-strategy", "only-if-needed", *pkgs],
-        check=True,
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")
+
+    missing = [pkg for pkg in ("bitsandbytes", "peft", "trl") if importlib.util.find_spec(pkg) is None]
+    if not missing:
+        print("[KAGGLE-DEPS] bitsandbytes, peft y trl ya están preinstalados en la imagen GPU.")
+        return
+
+    wheel_dirs = [dataset_dir, dataset_dir / "wheels"]
+    kaggle_in = Path("/kaggle/input")
+    if kaggle_in.exists():
+        for whl in kaggle_in.rglob("*.whl"):
+            if whl.parent not in wheel_dirs:
+                wheel_dirs.append(whl.parent)
+
+    local_wheels: List[str] = []
+    for pkg in missing:
+        matched = None
+        for wd in wheel_dirs:
+            if wd.exists():
+                found = sorted(wd.glob(f"{pkg}-*.whl"))
+                if found:
+                    matched = str(found[-1])
+                    break
+        if matched:
+            local_wheels.append(matched)
+
+    if len(local_wheels) == len(missing):
+        print(f"[KAGGLE-DEPS] Instalando wheels offline para {missing}: {local_wheels}")
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install", "-q", "--no-index", "--no-deps", *local_wheels],
+            check=True,
+        )
+        return
+
+    raise FileNotFoundError(
+        f"Faltan paquetes {missing} y no se hallaron sus wheels `.whl` offline en {dataset_dir}."
     )
 
 
@@ -75,6 +99,28 @@ def locate_mounted_dataset(explicit_dir: str | None = None) -> Path:
     raise FileNotFoundError(
         "No se encontró `sft_train_chileno.jsonl` en `--dataset-dir` ni bajo `/kaggle/input/`."
     )
+
+
+def resolve_base_model_path_or_id(base_model: str) -> tuple[str, bool]:
+    """Resuelve montaje NVMe local en `/kaggle/input` (`model_sources`) para operar 100% sin red."""
+    kaggle_input = Path("/kaggle/input")
+    if not kaggle_input.exists():
+        return base_model, False
+
+    candidates: List[Path] = []
+    for cfg in kaggle_input.rglob("config.json"):
+        parent = cfg.parent
+        if (parent / "tokenizer_config.json").exists():
+            candidates.append(parent)
+
+    token_hint = "7b-instruct" if "7B-Instruct" in base_model else ("4b" if "4B" in base_model else "")
+    if token_hint:
+        for c in candidates:
+            if token_hint in str(c).lower():
+                return str(c), True
+    if len(candidates) == 1:
+        return str(candidates[0]), True
+    return base_model, False
 
 
 def verify_mounted_ledger_governance(dataset_dir: Path) -> List[Dict[str, str]]:
@@ -162,7 +208,9 @@ def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
     if args.verify_only:
         return preflight_summary
 
-    ensure_kaggle_ml_dependencies()
+    ensure_kaggle_ml_dependencies(dataset_dir)
+    resolved_model_path, is_offline_mount = resolve_base_model_path_or_id(args.base_model)
+    print(f"[KAGGLE-MODEL] Fuente pesos='{resolved_model_path}' (offline_nvme={is_offline_mount})")
     t0 = time.time()
 
     import torch
@@ -189,14 +237,15 @@ def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
         bnb_4bit_use_double_quant=True,
     )
 
-    tokenizer = AutoTokenizer.from_pretrained(args.base_model)
+    tokenizer = AutoTokenizer.from_pretrained(resolved_model_path, local_files_only=is_offline_mount)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
     model = AutoModelForCausalLM.from_pretrained(
-        args.base_model,
+        resolved_model_path,
         quantization_config=bnb_cfg,
         device_map=gpu_profile["device_map"],
+        local_files_only=is_offline_mount,
     )
     model.config.use_cache = False
 
@@ -267,9 +316,10 @@ def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
 
     dpo_metrics: Dict[str, Any] = {"executed": False}
     base_post = AutoModelForCausalLM.from_pretrained(
-        args.base_model,
+        resolved_model_path,
         quantization_config=bnb_cfg,
         device_map=gpu_profile["device_map"],
+        local_files_only=is_offline_mount,
     )
     base_post.config.use_cache = False
     active_model = PeftModel.from_pretrained(
@@ -312,6 +362,13 @@ def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
         dpo_metrics = {"executed": True, "train_loss": float(dpo_res.training_loss)}
         active_model = dpo_trainer.model
 
+    # Normaliza `base_model_name_or_path` en `adapter_config.json` al ID canónico de Hugging Face
+    adapter_cfg_path = output_dir / "adapter_config.json"
+    if adapter_cfg_path.exists():
+        acfg = json.loads(adapter_cfg_path.read_text(encoding="utf-8"))
+        acfg["base_model_name_or_path"] = args.base_model
+        adapter_cfg_path.write_text(json.dumps(acfg, indent=2), encoding="utf-8")
+
     modelfile_src = dataset_dir / "Modelfile.roanso-chileno"
     if modelfile_src.exists():
         shutil.copy2(modelfile_src, output_dir / "Modelfile.roanso-chileno")
@@ -347,14 +404,14 @@ def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
         gen_ids = active_model.generate(**inputs, max_new_tokens=180, temperature=0.55, do_sample=True)
     sample_story = tokenizer.decode(gen_ids[0][inputs["input_ids"].shape[1] :], skip_special_tokens=True).strip()
 
-    # Limpia checkpoint intermedio antes de comprimir salida en Kaggle
     if sft_stage_dir != output_dir and sft_stage_dir.exists():
         shutil.rmtree(sft_stage_dir, ignore_errors=True)
 
     elapsed_s = round(time.time() - t0, 2)
     audit_payload = {
         **preflight_summary,
-        "training_platform": "Kaggle Notebooks GPU",
+        "training_platform": "Kaggle Notebooks GPU (Offline Air-Gapped)",
+        "mounted_model_path": resolved_model_path,
         "gpu_name": gpu_name,
         "gpu_profile": gpu_profile,
         "sft_train_loss": sft_loss,
