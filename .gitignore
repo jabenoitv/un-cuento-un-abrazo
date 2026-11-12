@@ -4,6 +4,8 @@ node_modules/
 dist/
 .netlify/
 .netlify
+.kaggle_staging/
+checkpoints/
 *.py[cod]
 *$py.class
 .venv/

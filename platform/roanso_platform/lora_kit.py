@@ -67,14 +67,14 @@ DPO_CHILEAN_PREFERENCE_SEEDS: List[Dict[str, str]] = [
     },
     {
         "prompt": (
-            "Narra para un perfil literal_claro cómo Lucas resuelve un ruido molesto en la estación "
-            "aplicando Carol Gray 10.2 (sin órdenes en 2ª persona ni sermones)."
+            "Narra con lenguaje claro y directo cómo Lucas resuelve un ruido molesto en la estación "
+            "explicando las intenciones de su amigo sin órdenes en 2ª persona ni sermones."
         ),
         "chosen": (
             "Lucas sintió los hombros apretados porque dos palancas juntas hacen un clic metálico fuerte. "
             "Levantó una mano con calma y explicó que ese ruido le molestaba en los oídos. Su amigo Tomás "
-            "lo entendió al tiro, eso quiere decir que lo comprendió de inmediato, y acordaron bajar una "
-            "sola palanca por turno."
+            "no quería incomodarlo, solo estaba muy entusiasmado por encender la luz verde; lo entendió al "
+            "tiro, eso quiere decir de inmediato, y acordaron bajar una sola palanca por turno."
         ),
         "rejected": (
             "Tú debes aguantar el ruido sin quejarte y tienes que portarte bien con tus amigos. La "
@@ -93,6 +93,82 @@ DPO_CHILEAN_PREFERENCE_SEEDS: List[Dict[str, str]] = [
         "rejected": (
             "De pronto una sombra misteriosa cruzó el muelle oscuro y nadie sabía qué peligro les "
             "esperaba. ¿Lograrán salvarse? Continuará..."
+        ),
+    },
+    {
+        "prompt": (
+            "Narra una escena cotidiana de amistad en el patio del colegio donde Sofía descubre las "
+            "verdaderas intenciones de un compañero sin usar etiquetas clínicas ni moralejas."
+        ),
+        "chosen": (
+            "Sofía miró su torre de bloques de madera recién caída sobre la banca del patio. Al ver las "
+            "mejillas coloradas y las manos abiertas de Martín buscando los bloques bajo la mesa, notó que "
+            "había pasado a llevar la banca sin querer al correr tras la pelota, así que respiró lento y "
+            "le propuso armar juntos el puente más firme."
+        ),
+        "rejected": (
+            "Como Sofía tiene un diagnóstico sensorial especial, el terapeuta dice que tú debes controlar "
+            "tu enojo y perdonar siempre para ser una niña buena."
+        ),
+    },
+    {
+        "prompt": (
+            "Describe cómo Gaspar pone un límite amable cuando un amigo le pide prestado su cuaderno de "
+            "trenes favoritos antes de terminar de dibujar."
+        ),
+        "chosen": (
+            "Gaspar sostuvo su cuaderno contra el chaleco azul y le dijo con voz tranquila a Julián que "
+            "primero quería terminar de pintar las ruedas de la locomotora y que en cinco minutos podrían "
+            "mirar todas las páginas juntos en la alfombra."
+        ),
+        "rejected": (
+            "¡Eres un niño egoísta si no prestas tus juguetes en este mismo instante! Todos los niños "
+            "buenos regalan sus cosas sin decir que no."
+        ),
+    },
+    {
+        "prompt": (
+            "Explica de manera natural una expresión figurada dentro de un cuento chileno tranquilo para "
+            "que cualquier niño siga la historia paso a paso."
+        ),
+        "chosen": (
+            "El abuelo miró las nubes grises sobre la cordillera y dijo que se venía el agua a cántaros, "
+            "eso significa que pronto caería una lluvia tupida y pareja sobre el techo de tejuelas, por lo "
+            "que entraron la leña seca al corredor."
+        ),
+        "rejected": (
+            "El abuelo habló en sentido figurado con puras metáforas irónicas que nadie entendió y después "
+            "se burló diciendo que era pan comido."
+        ),
+    },
+    {
+        "prompt": (
+            "Narra un cambio pequeño en el plan de la tarde mostrando calma y anticipación familiar en "
+            "español chileno cálido."
+        ),
+        "chosen": (
+            "Como la llovizna mojó la vereda de la plaza, mamá avisó temprano que hoy tomarían once en la "
+            "cocina tibia con pan amasado y después armarían la carpa de frazadas junto al sofá, manteniendo "
+            "el mismo orden tranquilo antes del cuento de la noche."
+        ),
+        "rejected": (
+            "Todo se canceló de sorpresa en el último segundo mientras sonaban bocinas estridentes en el "
+            "autobús rumbo a la acera mojada."
+        ),
+    },
+    {
+        "prompt": (
+            "Escribe un pasaje breve sobre pedir ayuda a un adulto de confianza cuando una broma en el "
+            "recreo deja de sentirse divertida."
+        ),
+        "chosen": (
+            "Cuando las risas alrededor del columpio empezaron a sonar demasiado fuertes, Emilia sintió el "
+            "pecho apretado, caminó tranquila hacia la profesora del patio y le contó con palabras simples "
+            "que prefería cambiar a un juego donde todos se rieran juntos y nadie quedara incómodo."
+        ),
+        "rejected": (
+            "En el tapiz mágico del reino encantado brilló un destello mágico que mágicamente resolvió "
+            "todo con una valiosa enseñanza moral."
         ),
     },
 ]
@@ -164,9 +240,10 @@ def build_sft_and_dpo_datasets(corpus_dir: Path, output_dir: Path) -> Dict[str, 
         "Narras siempre en 3ª persona cálida y prosa continua de un solo párrafo, en español de Chile "
         "natural (chaqueta, chaleco, conversar, frazada, vereda, estero, despacito), jamás usas "
         "mexicanismos ni doblaje neutro (chamarra, platicar, alberca, frijoles, autobús, zumo), "
-        "aplicas Carol Gray 10.2 (describir causas emocionales concretas, jamás ordenar en 2ª persona "
-        "ni dar moralejas), evitas modismos figurados sin explicar en perfiles literales y cierras "
-        "en calma profunda para inducir el sueño.\"\"\"\n",
+        "jamás incluyes etiquetas clínicas ni diagnósticas, muestras valores cotidianos describiendo "
+        "emociones e intenciones reales de los personajes sin ordenar en 2ª persona ni dar moralejas, "
+        "explicas cualquier expresión figurada con sencillez paso a paso y cierras en calma profunda "
+        "para acompañar el sueño familiar.\"\"\"\n",
         encoding="utf-8",
     )
 
