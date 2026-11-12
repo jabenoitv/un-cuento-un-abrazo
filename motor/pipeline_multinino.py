@@ -289,11 +289,13 @@ def analizar_cuento_multinino(texto: str, biblia: Dict[str, Any]) -> Dict[str, A
     if reglas.get("prosa_continua", True) and "\n" in texto.strip():
         errores.append("ERROR: El guion trae saltos de línea; debe ser prosa continua para OmniVoice.")
 
-    # 3. Frase de cierre personalizada de la familia
+    # 3. Frase de cierre personalizada de la familia y cero colas bibliográficas
     frase_cierre_regex = reglas.get("frase_cierre_regex", r"tu\s+pap[aá]\s+te\s+ama")
     frase_cierre_ejemplo = reglas.get("frase_cierre_texto", "tu papá te ama")
     if frase_cierre_regex and not re.search(frase_cierre_regex, texto, re.IGNORECASE):
         errores.append(f"ERROR: Falta la frase de cierre familiar ('{frase_cierre_ejemplo}').")
+    if re.search(r"\(\s*(contado\s+por|de\s+la\s+misma\s+fuente|recogido\s+en|informante\b)", texto, re.IGNORECASE):
+        errores.append("ERROR: Nota bibliográfica residual detectada; entrega únicamente la historia limpia.")
 
     # 4. Prohibición global de temas médicos/terapias + miedos específicos del niño
     evitar = list(PROHIBIDOS_SALUD_GLOBAL) + list(biblia.get("temas_evitar", []))
