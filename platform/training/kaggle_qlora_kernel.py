@@ -3,11 +3,11 @@
 
 Diseñado específicamente para correr sin costo dentro de la cuota gratuita de **Kaggle GPU**
 (`2x NVIDIA Tesla T4 16 GB = 32 GB VRAM`, arquitectura Turing `sm_75`):
-1. Instala automáticamente versiones compatibles de `bitsandbytes`, `peft`, `trl` y `accelerate` si corre en `/kaggle/working`.
+1. Instala versiones compatibles de `bitsandbytes`, `peft`, `trl`, `transformers` y `accelerate` sin reinstalar `torch`.
 2. Descubre el dataset privado montado en `/kaggle/input/roanso-cuentos-chileno-sft-v1` y audita `licencias_corpus.csv`
    (bloqueando licencias no comerciales/virales o corpus sintéticos antes de inicializar CUDA).
-3. Fija `device_map={"": 0}` y `fp16=True` en GPUs Turing (`sm_75`) para evitar el choque clásico de tensores multi-GPU
-   (`cuda:0` vs `cuda:1`) en `SFTTrainer` / `DPOTrainer` sobre instancias `T4 x2`.
+3. Fija `device_map={"": 0}` y `fp16=True` en GPUs Turing (`sm_75`) para evitar choques multi-GPU en `Trainer`,
+   y libera explícitamente VRAM entre Etapa 1 (`SFT`) y Etapa 2 (`DPO`) para mantenerse bajo ~9.5 GB de VRAM.
 4. Ejecuta Etapa 1 (`SFT` sobre pasajes literarios humanos) + Etapa 2 (`DPO` sobre preferencias chilenas y Diseño Universal)
    + prueba de humo nocturna y empaqueta `/kaggle/working/roanso-chileno-lora-v1.zip` (`Apache-2.0`).
 """
@@ -15,6 +15,8 @@ from __future__ import annotations
 
 import argparse
 import csv
+import gc
+import inspect
 import json
 import os
 import shutil
@@ -23,6 +25,8 @@ import sys
 import time
 from pathlib import Path
 from typing import Any, Dict, List
+
+DEFAULT_BASE_MODEL = os.environ.get("ROANSO_BASE_MODEL", "Qwen/Qwen2.5-7B-Instruct")
 
 APPROVED_APACHE_BASE_MODELS: Dict[str, float] = {
     "Qwen/Qwen2.5-7B-Instruct": 7.6,
@@ -39,19 +43,23 @@ def is_kaggle_runtime() -> bool:
 
 
 def ensure_kaggle_ml_dependencies() -> None:
-    """Instala dependencias QLoRA probadas cuando el script corre dentro de una VM GPU de Kaggle."""
+    """Instala dependencias QLoRA compatibles sin reinstalar el wheel CUDA de `torch` de Kaggle."""
     if not is_kaggle_runtime():
         return
     os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
     os.environ.setdefault("WANDB_DISABLED", "true")
     pkgs = [
-        "bitsandbytes>=0.44.0",
-        "peft>=0.13.0",
-        "trl>=0.12.0",
-        "accelerate>=1.0.0",
-        "datasets>=3.0.0",
+        "transformers>=4.51.0",
+        "bitsandbytes>=0.45.3",
+        "peft>=0.14.0",
+        "trl>=0.15.0",
+        "accelerate>=1.2.0",
+        "datasets>=3.2.0",
     ]
-    subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-U", *pkgs], check=True)
+    subprocess.run(
+        [sys.executable, "-m", "pip", "install", "-q", "--upgrade-strategy", "only-if-needed", *pkgs],
+        check=True,
+    )
 
 
 def locate_mounted_dataset(explicit_dir: str | None = None) -> Path:
@@ -108,6 +116,13 @@ def compute_kaggle_gpu_profile(has_cuda: bool, major_cc: int, device_count: int)
         "optim": "paged_adamw_8bit",
         "gradient_checkpointing": True,
     }
+
+
+def _filter_supported_kwargs(cls: Any, desired: Dict[str, Any]) -> Dict[str, Any]:
+    sig_params = inspect.signature(cls.__init__).parameters
+    if any(p.kind == inspect.Parameter.VAR_KEYWORD for p in sig_params.values()):
+        return desired
+    return {k: v for k, v in desired.items() if k in sig_params}
 
 
 def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
@@ -203,24 +218,33 @@ def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
     sft_stage_dir = output_dir / "sft_checkpoint" if (args.run_dpo and dpo_count > 0) else output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    sft_cfg = SFTConfig(
-        output_dir=str(sft_stage_dir),
-        num_train_epochs=args.epochs,
-        per_device_train_batch_size=args.batch_size,
-        gradient_accumulation_steps=args.grad_accum,
-        learning_rate=2e-4,
-        lr_scheduler_type="cosine",
-        warmup_ratio=0.08,
-        logging_steps=10,
-        eval_strategy="epoch",
-        save_strategy="epoch",
-        max_seq_length=1536,
-        bf16=gpu_profile["bf16"],
-        fp16=gpu_profile["fp16"],
-        gradient_checkpointing=True,
-        optim=gpu_profile["optim"],
-        report_to="none",
-    )
+    sft_sig = inspect.signature(SFTConfig.__init__).parameters
+    sft_raw_kwargs: Dict[str, Any] = {
+        "output_dir": str(sft_stage_dir),
+        "num_train_epochs": args.epochs,
+        "per_device_train_batch_size": args.batch_size,
+        "gradient_accumulation_steps": args.grad_accum,
+        "learning_rate": 2e-4,
+        "lr_scheduler_type": "cosine",
+        "warmup_steps": 10,
+        "logging_steps": 10,
+        "save_strategy": "epoch",
+        "bf16": gpu_profile["bf16"],
+        "fp16": gpu_profile["fp16"],
+        "gradient_checkpointing": True,
+        "optim": gpu_profile["optim"],
+        "report_to": "none",
+    }
+    if "max_length" in sft_sig:
+        sft_raw_kwargs["max_length"] = 1280
+    elif "max_seq_length" in sft_sig:
+        sft_raw_kwargs["max_seq_length"] = 1280
+    if "eval_strategy" in sft_sig:
+        sft_raw_kwargs["eval_strategy"] = "epoch"
+    elif "evaluation_strategy" in sft_sig:
+        sft_raw_kwargs["evaluation_strategy"] = "epoch"
+
+    sft_cfg = SFTConfig(**_filter_supported_kwargs(SFTConfig, sft_raw_kwargs))
 
     sft_trainer = SFTTrainer(
         model=model,
@@ -231,37 +255,52 @@ def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
         args=sft_cfg,
     )
     sft_result = sft_trainer.train()
+    sft_loss = float(sft_result.training_loss)
     sft_trainer.save_model(str(sft_stage_dir))
     tokenizer.save_pretrained(str(sft_stage_dir))
 
+    # Libera estados del optimizador SFT antes de iniciar DPO / inferencia en T4 16GB
+    del sft_trainer
+    del model
+    gc.collect()
+    torch.cuda.empty_cache()
+
     dpo_metrics: Dict[str, Any] = {"executed": False}
+    base_post = AutoModelForCausalLM.from_pretrained(
+        args.base_model,
+        quantization_config=bnb_cfg,
+        device_map=gpu_profile["device_map"],
+    )
+    base_post.config.use_cache = False
+    active_model = PeftModel.from_pretrained(
+        base_post,
+        str(sft_stage_dir),
+        is_trainable=bool(args.run_dpo and dpo_count > 0),
+    )
+
     if args.run_dpo and dpo_count > 0:
         print(f"[KAGGLE-DPO] Refinando {dpo_count} pares chilenos de Diseño Universal...")
         dpo_ds = load_dataset("json", data_files={"train": str(dpo_jsonl)})["train"]
-        base_for_dpo = AutoModelForCausalLM.from_pretrained(
-            args.base_model,
-            quantization_config=bnb_cfg,
-            device_map=gpu_profile["device_map"],
-        )
-        base_for_dpo.config.use_cache = False
-        policy_model = PeftModel.from_pretrained(base_for_dpo, str(sft_stage_dir), is_trainable=True)
-        dpo_cfg = DPOConfig(
-            output_dir=str(output_dir),
-            num_train_epochs=2,
-            per_device_train_batch_size=1,
-            gradient_accumulation_steps=4,
-            learning_rate=5e-5,
-            beta=0.1,
-            bf16=gpu_profile["bf16"],
-            fp16=gpu_profile["fp16"],
-            gradient_checkpointing=True,
-            optim=gpu_profile["optim"],
-            logging_steps=2,
-            save_strategy="no",
-            report_to="none",
-        )
+        dpo_raw_kwargs: Dict[str, Any] = {
+            "output_dir": str(output_dir),
+            "num_train_epochs": 2,
+            "per_device_train_batch_size": 1,
+            "gradient_accumulation_steps": 4,
+            "learning_rate": 5e-5,
+            "beta": 0.1,
+            "max_length": 768,
+            "max_prompt_length": 256,
+            "bf16": gpu_profile["bf16"],
+            "fp16": gpu_profile["fp16"],
+            "gradient_checkpointing": True,
+            "optim": gpu_profile["optim"],
+            "logging_steps": 2,
+            "save_strategy": "no",
+            "report_to": "none",
+        }
+        dpo_cfg = DPOConfig(**_filter_supported_kwargs(DPOConfig, dpo_raw_kwargs))
         dpo_trainer = DPOTrainer(
-            model=policy_model,
+            model=active_model,
             ref_model=None,
             args=dpo_cfg,
             train_dataset=dpo_ds,
@@ -271,6 +310,7 @@ def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
         dpo_trainer.save_model(str(output_dir))
         tokenizer.save_pretrained(str(output_dir))
         dpo_metrics = {"executed": True, "train_loss": float(dpo_res.training_loss)}
+        active_model = dpo_trainer.model
 
     modelfile_src = dataset_dir / "Modelfile.roanso-chileno"
     if modelfile_src.exists():
@@ -293,13 +333,23 @@ def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
             ),
         },
     ]
-    rendered = tokenizer.apply_chat_template(smoke_prompt, tokenize=False, add_generation_prompt=True)
+    template_kwargs: Dict[str, Any] = {"tokenize": False, "add_generation_prompt": True}
+    if "Qwen3" in args.base_model:
+        template_kwargs["enable_thinking"] = False
+    try:
+        rendered = tokenizer.apply_chat_template(smoke_prompt, **template_kwargs)
+    except TypeError:
+        rendered = tokenizer.apply_chat_template(smoke_prompt, tokenize=False, add_generation_prompt=True)
+
     inputs = tokenizer(rendered, return_tensors="pt").to("cuda:0")
-    eval_model = sft_trainer.model
-    eval_model.eval()
+    active_model.eval()
     with torch.no_grad():
-        gen_ids = eval_model.generate(**inputs, max_new_tokens=180, temperature=0.55, do_sample=True)
+        gen_ids = active_model.generate(**inputs, max_new_tokens=180, temperature=0.55, do_sample=True)
     sample_story = tokenizer.decode(gen_ids[0][inputs["input_ids"].shape[1] :], skip_special_tokens=True).strip()
+
+    # Limpia checkpoint intermedio antes de comprimir salida en Kaggle
+    if sft_stage_dir != output_dir and sft_stage_dir.exists():
+        shutil.rmtree(sft_stage_dir, ignore_errors=True)
 
     elapsed_s = round(time.time() - t0, 2)
     audit_payload = {
@@ -307,7 +357,7 @@ def run_kaggle_qlora_pipeline(args: argparse.Namespace) -> Dict[str, Any]:
         "training_platform": "Kaggle Notebooks GPU",
         "gpu_name": gpu_name,
         "gpu_profile": gpu_profile,
-        "sft_train_loss": float(sft_result.training_loss),
+        "sft_train_loss": sft_loss,
         "dpo_stage": dpo_metrics,
         "elapsed_seconds": elapsed_s,
         "smoke_story_preview": sample_story,
@@ -330,7 +380,7 @@ def main() -> None:
         else "./checkpoints/roanso-chileno-lora-v1"
     )
     parser = argparse.ArgumentParser(description="ROANSO Kaggle GPU QLoRA + DPO Trainer")
-    parser.add_argument("--base-model", default="Qwen/Qwen2.5-7B-Instruct")
+    parser.add_argument("--base-model", default=DEFAULT_BASE_MODEL)
     parser.add_argument("--dataset-dir", default=None)
     parser.add_argument("--output-dir", default=default_out)
     parser.add_argument("--epochs", type=int, default=3)

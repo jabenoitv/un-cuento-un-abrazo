@@ -95,7 +95,7 @@ def _write_clean_sine_wav(wav_path: Path, sample_rate: int = 24000, seconds: flo
 
 def test_01_slug_fence_protects_non_roanso_kaggle_projects() -> None:
     assert assert_safe_roanso_slug("roanso-cuentos-chileno-sft-v1") == "roanso-cuentos-chileno-sft-v1"
-    for protected_other_slug in ("bombas-braun-cctv-pozos", "voz-javier-corpus-248", "otro-proyecto"):
+    for protected_other_slug in ("proyecto-externo-industrial", "corpus-ajeno-privado", "otro-proyecto"):
         with pytest.raises(PermissionError, match="roanso-"):
             assert_safe_roanso_slug(protected_other_slug)
 
@@ -134,7 +134,7 @@ def test_03_stage_slm_bundle_and_t4_x2_preflight(tmp_path: Path) -> None:
     assert ds_meta["isPrivate"] is True
     assert kn_meta["is_private"] is True
     assert kn_meta["enable_gpu"] is True
-    assert kn_meta["dataset_sources"] == ["roanso_lab/roanso-cuentos-chileno-sft-v1"]
+    assert kn_meta["dataset_sources"] == ["roanso_lab/roanso-corpus-chileno-sft"]
 
     # Verifica preflight del kernel QLoRA sobre el dataset empaquetado
     preflight = run_kaggle_qlora_pipeline(

@@ -32,8 +32,8 @@ from roanso_platform.lora_kit import (  # noqa: E402
 )
 
 ROANSO_REQUIRED_SLUG_PREFIX = "roanso-"
-DEFAULT_SLM_DATASET_SLUG = "roanso-cuentos-chileno-sft-v1"
-DEFAULT_SLM_KERNEL_SLUG = "roanso-qlora-cuentos-chileno-v1"
+DEFAULT_SLM_DATASET_SLUG = "roanso-corpus-chileno-sft"
+DEFAULT_SLM_KERNEL_SLUG = "roanso-qlora-qwen2-5-7b-chileno-v1"
 DEFAULT_TTS_KERNEL_SLUG = "roanso-tts-voces-chile-v1"
 
 
@@ -94,12 +94,28 @@ def get_authenticated_kaggle_api(kaggle_json_path: Path | None = None) -> tuple[
     return api, creds
 
 
+def resolve_authenticated_owner(api: Any, fallback_username: str) -> str:
+    """Obtiene el handle real del titular del token KGAT en Kaggle (evitando desajustes en kaggle.json)."""
+    try:
+        my_ds = api.dataset_list(mine=True)
+        if my_ds:
+            return str(my_ds[0].ref).split("/", 1)[0]
+        my_kn = api.kernels_list(mine=True)
+        if my_kn:
+            return str(my_kn[0].ref).split("/", 1)[0]
+    except Exception:
+        pass
+    return fallback_username
+
+
 def stage_slm_kaggle_bundle(
     corpus_dir: Path,
     staging_root: Path,
     kaggle_username: str,
     dataset_slug: str = DEFAULT_SLM_DATASET_SLUG,
     kernel_slug: str = DEFAULT_SLM_KERNEL_SLUG,
+    base_model: str = "Qwen/Qwen2.5-7B-Instruct",
+    kernel_title: str | None = None,
 ) -> Dict[str, Any]:
     """Prepara localmente el Dataset Privado + Kernel GPU (`T4 x2`) listos para subir a Kaggle."""
     safe_ds_slug = assert_safe_roanso_slug(dataset_slug)
@@ -108,7 +124,7 @@ def stage_slm_kaggle_bundle(
     verified = verify_corpus_integrity_against_ledger(corpus_dir)
 
     ds_dir = staging_root / "slm_dataset"
-    kn_dir = staging_root / "slm_kernel"
+    kn_dir = staging_root / f"slm_kernel_{safe_kn_slug}"
     if ds_dir.exists():
         shutil.rmtree(ds_dir)
     if kn_dir.exists():
@@ -122,7 +138,7 @@ def stage_slm_kaggle_bundle(
         shutil.copy2(corpus_dir / "CREDITOS_LICENCIAS.md", ds_dir / "CREDITOS_LICENCIAS.md")
 
     dataset_meta = {
-        "title": "ROANSO Cuentos Chileno SFT y DPO Auditado",
+        "title": safe_ds_slug.replace("-", " ").title(),
         "id": f"{kaggle_username}/{safe_ds_slug}",
         "licenses": [{"name": "CC-BY-4.0"}],
         "isPrivate": True,
@@ -133,11 +149,16 @@ def stage_slm_kaggle_bundle(
     )
 
     kernel_src = Path(__file__).resolve().parent / "kaggle_qlora_kernel.py"
-    shutil.copy2(kernel_src, kn_dir / "kaggle_qlora_kernel.py")
+    kernel_code = kernel_src.read_text(encoding="utf-8").replace(
+        'DEFAULT_BASE_MODEL = os.environ.get("ROANSO_BASE_MODEL", "Qwen/Qwen2.5-7B-Instruct")',
+        f'DEFAULT_BASE_MODEL = os.environ.get("ROANSO_BASE_MODEL", "{base_model}")',
+    )
+    (kn_dir / "kaggle_qlora_kernel.py").write_text(kernel_code, encoding="utf-8")
 
+    resolved_title = kernel_title or safe_kn_slug.replace("-", " ").title()
     kernel_meta = {
         "id": f"{kaggle_username}/{safe_kn_slug}",
-        "title": "ROANSO QLoRA Narrador Chileno Apache 2.0",
+        "title": resolved_title,
         "code_file": "kaggle_qlora_kernel.py",
         "language": "python",
         "kernel_type": "script",
@@ -158,6 +179,7 @@ def stage_slm_kaggle_bundle(
     return {
         "dataset_id": dataset_meta["id"],
         "kernel_id": kernel_meta["id"],
+        "base_model": base_model,
         "dataset_dir": str(ds_dir),
         "kernel_dir": str(kn_dir),
         "verified_works": len(verified),
@@ -219,47 +241,59 @@ def push_slm_to_kaggle(
     staging_root: Path,
     dataset_slug: str = DEFAULT_SLM_DATASET_SLUG,
     kernel_slug: str = DEFAULT_SLM_KERNEL_SLUG,
+    base_model: str = "Qwen/Qwen2.5-7B-Instruct",
+    skip_dataset_upload: bool = False,
     kaggle_json_path: Path | None = None,
 ) -> Dict[str, Any]:
     """Sube (o versiona) el Dataset Privado ROANSO y lanza el entrenamiento GPU en Kaggle."""
     safe_ds_slug = assert_safe_roanso_slug(dataset_slug)
     safe_kn_slug = assert_safe_roanso_slug(kernel_slug)
     api, creds = get_authenticated_kaggle_api(kaggle_json_path=kaggle_json_path)
+    owner = resolve_authenticated_owner(api, creds.username)
 
     staged = stage_slm_kaggle_bundle(
         corpus_dir=corpus_dir,
         staging_root=staging_root,
-        kaggle_username=creds.username,
+        kaggle_username=owner,
         dataset_slug=safe_ds_slug,
         kernel_slug=safe_kn_slug,
+        base_model=base_model,
     )
 
-    existing_ds_refs = {str(d.ref).lower() for d in api.dataset_list(mine=True)}
-    target_ds_ref = staged["dataset_id"].lower()
-
-    if target_ds_ref in existing_ds_refs:
-        api.dataset_create_version(
-            staged["dataset_dir"],
-            version_notes="Actualizacion corpus auditado SHA-256 y pares DPO chilenos",
-            quiet=True,
-            convert_to_csv=False,
-        )
-        ds_action = "versioned"
+    if skip_dataset_upload:
+        ds_action = "reused_existing_private"
     else:
-        api.dataset_create_new(
-            staged["dataset_dir"],
-            public=False,
-            quiet=True,
-            convert_to_csv=False,
-        )
-        ds_action = "created_private"
-        time.sleep(8)
+        existing_ds_refs = {str(d.ref).lower() for d in api.dataset_list(mine=True)}
+        target_ds_ref = staged["dataset_id"].lower()
+
+        if target_ds_ref in existing_ds_refs:
+            api.dataset_create_version(
+                staged["dataset_dir"],
+                version_notes="Actualizacion corpus auditado SHA-256 y pares DPO chilenos",
+                quiet=True,
+                convert_to_csv=False,
+            )
+            ds_action = "versioned"
+        else:
+            api.dataset_create_new(
+                staged["dataset_dir"],
+                public=False,
+                quiet=True,
+                convert_to_csv=False,
+            )
+            ds_action = "created_private"
+        time.sleep(10)
 
     push_res = api.kernels_push(staged["kernel_dir"])
+    err_msg = getattr(push_res, "error", None)
+    if err_msg:
+        raise RuntimeError(f"Kaggle rechazó `kernels_push`: {err_msg}")
+
     return {
         "dataset_id": staged["dataset_id"],
         "dataset_action": ds_action,
         "kernel_id": staged["kernel_id"],
+        "base_model": base_model,
         "kernel_url": getattr(push_res, "url", f"https://www.kaggle.com/code/{staged['kernel_id']}"),
         "sft_train_examples": staged["sft_train_examples"],
         "dpo_preference_pairs": staged["dpo_preference_pairs"],
@@ -269,7 +303,8 @@ def push_slm_to_kaggle(
 def check_kernel_status(kernel_slug: str = DEFAULT_SLM_KERNEL_SLUG, kaggle_json_path: Path | None = None) -> Dict[str, Any]:
     safe_kn_slug = assert_safe_roanso_slug(kernel_slug)
     api, creds = get_authenticated_kaggle_api(kaggle_json_path=kaggle_json_path)
-    full_ref = f"{creds.username}/{safe_kn_slug}"
+    owner = resolve_authenticated_owner(api, creds.username)
+    full_ref = f"{owner}/{safe_kn_slug}"
     st = api.kernels_status(full_ref)
     return {
         "kernel_id": full_ref,
@@ -285,7 +320,8 @@ def pull_kernel_output(
 ) -> Dict[str, Any]:
     safe_kn_slug = assert_safe_roanso_slug(kernel_slug)
     api, creds = get_authenticated_kaggle_api(kaggle_json_path=kaggle_json_path)
-    full_ref = f"{creds.username}/{safe_kn_slug}"
+    owner = resolve_authenticated_owner(api, creds.username)
+    full_ref = f"{owner}/{safe_kn_slug}"
     output_dir.mkdir(parents=True, exist_ok=True)
     files, _token = api.kernels_output(full_ref, path=str(output_dir), quiet=True)
     return {
@@ -316,6 +352,9 @@ def main() -> None:
     p_push = sub.add_parser("push-slm", help="Sube Dataset Privado y lanza entrenamiento GPU QLoRA en Kaggle")
     p_push.add_argument("--corpus-dir", default=str(default_corpus))
     p_push.add_argument("--staging-dir", default=str(default_staging))
+    p_push.add_argument("--kernel-slug", default=DEFAULT_SLM_KERNEL_SLUG)
+    p_push.add_argument("--base-model", default="Qwen/Qwen2.5-7B-Instruct")
+    p_push.add_argument("--skip-dataset-upload", action="store_true")
 
     p_stat = sub.add_parser("status", help="Consulta estado en vivo del entrenamiento GPU en Kaggle")
     p_stat.add_argument("--kernel-slug", default=DEFAULT_SLM_KERNEL_SLUG)
@@ -332,7 +371,13 @@ def main() -> None:
         user = args.username or load_kaggle_credentials().username
         res = stage_tts_kaggle_bundle(Path(args.staging_dir), kaggle_username=user, private_voice_dataset_slug=args.voice_dataset_slug)
     elif args.cmd == "push-slm":
-        res = push_slm_to_kaggle(Path(args.corpus_dir), Path(args.staging_dir))
+        res = push_slm_to_kaggle(
+            Path(args.corpus_dir),
+            Path(args.staging_dir),
+            kernel_slug=args.kernel_slug,
+            base_model=args.base_model,
+            skip_dataset_upload=args.skip_dataset_upload,
+        )
     elif args.cmd == "status":
         res = check_kernel_status(args.kernel_slug)
     elif args.cmd == "pull-output":
