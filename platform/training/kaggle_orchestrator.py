@@ -36,6 +36,7 @@ ROANSO_REQUIRED_SLUG_PREFIX = "roanso-"
 DEFAULT_SLM_DATASET_SLUG = "roanso-corpus-chileno-sft"
 DEFAULT_SLM_KERNEL_SLUG = "roanso-qlora-qwen2-5-7b-chileno-v1"
 DEFAULT_TTS_KERNEL_SLUG = "roanso-tts-voces-chile-v1"
+DEFAULT_BENCHMARK_KERNEL_SLUG = "roanso-benchmark-dual-t4-v1"
 
 KAGGLE_OFFLINE_MODEL_SOURCES: Dict[str, list[str]] = {
     "Qwen/Qwen2.5-7B-Instruct": ["qwen-lm/qwen2.5/transformers/7b-instruct/1"],
@@ -286,6 +287,89 @@ def stage_tts_kaggle_bundle(
     }
 
 
+def stage_benchmark_kaggle_bundle(
+    staging_root: Path,
+    kaggle_username: str,
+    dataset_slug: str = DEFAULT_SLM_DATASET_SLUG,
+    kernel_slug: str = DEFAULT_BENCHMARK_KERNEL_SLUG,
+    q4_kernel_slug: str = "roanso-qlora-qwen3-4b-chileno-v1",
+    q7_kernel_slug: str = DEFAULT_SLM_KERNEL_SLUG,
+) -> Dict[str, Any]:
+    """Prepara el Kernel Privado Air-Gapped Dual-T4 para benchmark comparativo en Kaggle."""
+    safe_ds_slug = assert_safe_roanso_slug(dataset_slug)
+    safe_kn_slug = assert_safe_roanso_slug(kernel_slug)
+    safe_q4_slug = assert_safe_roanso_slug(q4_kernel_slug)
+    safe_q7_slug = assert_safe_roanso_slug(q7_kernel_slug)
+
+    kn_dir = staging_root / f"bench_kernel_{safe_kn_slug}"
+    if kn_dir.exists():
+        shutil.rmtree(kn_dir)
+    kn_dir.mkdir(parents=True, exist_ok=True)
+
+    kernel_src = Path(__file__).resolve().parent / "kaggle_benchmark_kernel.py"
+    shutil.copy2(kernel_src, kn_dir / "kaggle_benchmark_kernel.py")
+
+    offline_models = (
+        KAGGLE_OFFLINE_MODEL_SOURCES["Qwen/Qwen3-4B"]
+        + KAGGLE_OFFLINE_MODEL_SOURCES["Qwen/Qwen2.5-7B-Instruct"]
+    )
+    kernel_meta = {
+        "id": f"{kaggle_username}/{safe_kn_slug}",
+        "title": safe_kn_slug.replace("-", " ").title(),
+        "code_file": "kaggle_benchmark_kernel.py",
+        "language": "python",
+        "kernel_type": "script",
+        "is_private": True,
+        "enable_gpu": True,
+        "enable_tpu": False,
+        "enable_internet": False,
+        "dataset_sources": [f"{kaggle_username}/{safe_ds_slug}"],
+        "competition_sources": [],
+        "kernel_sources": [
+            f"{kaggle_username}/{safe_q4_slug}",
+            f"{kaggle_username}/{safe_q7_slug}",
+        ],
+        "model_sources": offline_models,
+    }
+    (kn_dir / "kernel-metadata.json").write_text(
+        json.dumps(kernel_meta, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    return {
+        "kernel_id": kernel_meta["id"],
+        "kernel_dir": str(kn_dir),
+        "mounted_models": offline_models,
+        "mounted_lora_kernels": [safe_q4_slug, safe_q7_slug],
+    }
+
+
+def push_benchmark_to_kaggle(
+    staging_root: Path,
+    dataset_slug: str = DEFAULT_SLM_DATASET_SLUG,
+    kernel_slug: str = DEFAULT_BENCHMARK_KERNEL_SLUG,
+    kaggle_json_path: Path | None = None,
+) -> Dict[str, Any]:
+    """Lanza el benchmark comparativo Dual-T4 en Kaggle sin consumir 1 MB de VRAM local."""
+    api, creds = get_authenticated_kaggle_api(kaggle_json_path=kaggle_json_path)
+    owner = resolve_authenticated_owner(api, creds.username)
+    staged = stage_benchmark_kaggle_bundle(
+        staging_root=staging_root,
+        kaggle_username=owner,
+        dataset_slug=dataset_slug,
+        kernel_slug=kernel_slug,
+    )
+    push_res = api.kernels_push(staged["kernel_dir"])
+    err_msg = getattr(push_res, "error", None)
+    if err_msg:
+        raise RuntimeError(f"Kaggle rechazó `kernels_push` del benchmark: {err_msg}")
+    return {
+        "kernel_id": staged["kernel_id"],
+        "kernel_url": getattr(push_res, "url", f"https://www.kaggle.com/code/{staged['kernel_id']}"),
+        "mounted_models": staged["mounted_models"],
+        "mounted_lora_kernels": staged["mounted_lora_kernels"],
+    }
+
+
 def push_slm_to_kaggle(
     corpus_dir: Path,
     staging_root: Path,
@@ -408,6 +492,10 @@ def main() -> None:
     p_push.add_argument("--base-model", default="Qwen/Qwen2.5-7B-Instruct")
     p_push.add_argument("--skip-dataset-upload", action="store_true")
 
+    p_bench = sub.add_parser("push-benchmark", help="Lanza benchmark comparativo Dual-T4 en Kaggle (0% GPU local)")
+    p_bench.add_argument("--staging-dir", default=str(default_staging))
+    p_bench.add_argument("--kernel-slug", default=DEFAULT_BENCHMARK_KERNEL_SLUG)
+
     p_stat = sub.add_parser("status", help="Consulta estado en vivo del entrenamiento GPU en Kaggle")
     p_stat.add_argument("--kernel-slug", default=DEFAULT_SLM_KERNEL_SLUG)
 
@@ -429,6 +517,11 @@ def main() -> None:
             kernel_slug=args.kernel_slug,
             base_model=args.base_model,
             skip_dataset_upload=args.skip_dataset_upload,
+        )
+    elif args.cmd == "push-benchmark":
+        res = push_benchmark_to_kaggle(
+            staging_root=Path(args.staging_dir),
+            kernel_slug=args.kernel_slug,
         )
     elif args.cmd == "status":
         res = check_kernel_status(args.kernel_slug)

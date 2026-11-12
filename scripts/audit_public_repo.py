@@ -25,6 +25,8 @@ FORBIDDEN_PATTERNS = [
     (r"c:/dev/cuentos-ia", "Local Windows workspace path"),
     (r"AIza[0-9A-Za-z\-_]{30,}", "Google API key"),
     (r"sk-[0-9A-Za-z]{25,}", "OpenAI/API secret key"),
+    (r"KGAT_[0-9A-Za-z]{20,}", "Kaggle API bearer token"),
+    (r"nfp_[0-9A-Za-z]{20,}", "Netlify personal access token"),
 ]
 
 TEXT_EXTS = {
@@ -39,6 +41,7 @@ ALLOWED_SHOWCASE_BINARIES = {
     "platform/showcase_assets/demo_lucas_cap1.mp3",
     "platform/showcase_assets/demo_mateo_cap1.mp3",
     "platform/showcase_assets/demo_fresia_cap1.mp3",
+    "platform/showcase_assets/demo_qwen3_4b_lora_chileno.mp3",
 }
 
 

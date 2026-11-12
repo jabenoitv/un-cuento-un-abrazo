@@ -5,7 +5,7 @@
 - **Palabras limpias totales:** `101968` (`0` apariciones residuales de marca registrada)
 - **Pasajes nocturnos seguros (`pasajes_nocturnos_seguros.jsonl`):** `497` (filtrados de portadas académicas y violencia folclórica)
 - **Ejemplos SFT ChatML (`sft_train_chileno.jsonl` + `sft_val_chileno.jsonl`):** `447 train` / `50 val`
-- **Pares DPO Preferencias Chilenas (`dpo_preferencias_chilenas.jsonl`):** `3`
+- **Pares DPO Preferencias Chilenas (`dpo_preferencias_chilenas.jsonl`):** `8` (Diseño Universal Invisible, cero etiquetas clínicas y cero moralejas)
 
 ## 2. Benchmark en Vivo (`<= 8B` Open-Weights Local: Vanilla `qwen2.5:7b` vs. `roanso-chileno:7b`)
 

@@ -1,0 +1,500 @@
+{
+  "schema_version": "1.0",
+  "cost_usd": 0.0,
+  "air_gapped_offline": true,
+  "hardware": {
+    "platform": "Kaggle Notebooks GPU (Zero Local PC VRAM)",
+    "gpu_name": "Tesla T4",
+    "gpu_count": 2
+  },
+  "models": {
+    "qwen3_4b": {
+      "base_model": "Qwen/Qwen3-4B",
+      "license": "Apache-2.0",
+      "params_billions": 4.0,
+      "gpu_device": "cuda:0 (Tesla T4)",
+      "vram_peak_allocated_mib": 3790.3,
+      "adapter_safetensors_bytes": 132187888,
+      "adapter_safetensors_sha256": "cc8eb21f28cb2a749d95e3106e712b2bc8df2b80d38618cd0c0c6fbe5fc9350c",
+      "held_out_validation": {
+        "val_examples": 50,
+        "base_val_loss": 3.4891,
+        "lora_val_loss": 2.5356,
+        "base_perplexity": 32.76,
+        "lora_perplexity": 12.62,
+        "perplexity_reduction_percent": 61.48
+      },
+      "universal_design_5_scenarios": {
+        "scenarios_count": 5,
+        "base_unaligned_passes": 0,
+        "base_unaligned_pass_rate_pct": 0.0,
+        "roanso_qlora_passes": 5,
+        "roanso_qlora_pass_rate_pct": 100.0,
+        "mean_roanso_inflesz": 70.41,
+        "total_10gram_collisions": 0,
+        "results": [
+          {
+            "scenario_id": "cuento_1_puente_recreo",
+            "title": "El puente de bloques en el recreo",
+            "everyday_value": "diferenciar un accidente por entusiasmo de una mala intención",
+            "base_unaligned": {
+              "passed": false,
+              "word_count": 227,
+              "sentence_count": 24,
+              "avg_words_per_sentence": 9.46,
+              "szigriszt_pazos_inflesz": 81.83,
+              "fernandez_huerta": 85.91,
+              "chilean_markers_found": [],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [
+                "formato_multiparrafo (14 bloques)",
+                "falta_frase_cierre_calma"
+              ],
+              "excerpt": "**Título: Sofía y Martín: El Puente de Bloques**\n\nEn un pequeño pueblo lleno de colores y sonidos, vivía una niña llamada Sofía y un chico llamado Martín. Sofía era muy creativa y siempre tenía un puente de bloques listo para construir. Martín, por su parte, e..."
+            },
+            "roanso_qlora_human_scale": {
+              "passed": true,
+              "word_count": 196,
+              "sentence_count": 10,
+              "avg_words_per_sentence": 19.6,
+              "szigriszt_pazos_inflesz": 64.22,
+              "fernandez_huerta": 68.38,
+              "chilean_markers_found": [
+                "banca",
+                "estero",
+                "frazada",
+                "patio"
+              ],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [],
+              "turns_used": 1,
+              "story_text": "Sofía se sentaba en el banco de madera del patio techado, con la mirada fija en el suelo, mientras se aseguraba el nudo de la cuerda que sujetaba los dos extremos del puente. El sol se había acostado hacia el horizonte, dejando un rastro de colores dorados que reflejaban en el agua del estero cercano. Martín pasaba corriendo, con los brazos extendidos, buscando la pelota que se había perdido entre las piedras. De repente, en un momento de distracción, el muchacho rozó la esquina del puente, y los bloques cayeron con un ruido sordo sobre la banca. Sofía levantó la vista, notando que sus mejillas se sonrojaron ligeramente, pero no se movió. Observó los gestos de Martín: sus ojos se abrieron de susto, y al instante, dejó la pelota y se agachó para recoger los bloques. Sofía entendió que no había sido intención mala, sino un error de juicio. Juntos, reconstruyeron el puente, con cuidado y paciencia, mientras Martín se mostraba más atento y respetuoso. Esa noche, cuando el viento soplaba suavemente por la ventana, Sofía se acurrucó bajo su frazada, sintiendo la seguridad de saber que su amistad era verdadera. En casa te queremos mucho."
+            }
+          },
+          {
+            "scenario_id": "cuento_2_locomotora_azul",
+            "title": "Cinco minutos más con la locomotora azul",
+            "everyday_value": "poner un límite amable sin enojarse ni sentirse culpable",
+            "base_unaligned": {
+              "passed": false,
+              "word_count": 243,
+              "sentence_count": 26,
+              "avg_words_per_sentence": 9.35,
+              "szigriszt_pazos_inflesz": 89.04,
+              "fernandez_huerta": 92.86,
+              "chilean_markers_found": [],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [
+                "formato_multiparrafo (15 bloques)",
+                "falta_frase_cierre_calma"
+              ],
+              "excerpt": "**El Juego de los Lápices**\n\nEn un pueblo pequeño, donde todos conocían a todos, vivía un niño llamado **Gaspar** y su primo, **Julián**. Ambos eran muy juguetones y siempre tenían muchas cosas para jugar. Gaspar era un niño curioso, pero a veces un poco egoís..."
+            },
+            "roanso_qlora_human_scale": {
+              "passed": true,
+              "word_count": 185,
+              "sentence_count": 13,
+              "avg_words_per_sentence": 14.23,
+              "szigriszt_pazos_inflesz": 72.38,
+              "fernandez_huerta": 76.54,
+              "chilean_markers_found": [
+                "once",
+                "patio",
+                "tibio",
+                "tranquilo"
+              ],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [],
+              "turns_used": 1,
+              "story_text": "Gaspar se sentaba sobre la alfombra de la casa, con el lápiz azul oscuro entre sus dedos, dibujando una locomotora del Sur. Era la última rueda que faltaba para completar el dibujo. Julián, su primo, se acercó con una sonrisa y estiró la mano para pedirle el lápiz azul oscuro. Gaspar notó que sus hombros estaban apretados y, sin moverse de su lugar, le explicó con voz clara y amable que terminaría la rueda contando hasta veinte. Mientras Julián esperaba, Gaspar le ofreció el lápiz celeste claro para pintar las olas. Julián aceptó con una sonrisa y se sentó junto a Gaspar, dibujando con el nuevo lápiz. Pasaron unos minutos y, cuando Gaspar terminó de contar, Julián levantó la vista y vio la locomotora completa. Se levantó y se fue a la cocina. Gaspar lo siguió y ambos tomaron once con pan tibio. Mientras caminaban por el patio, Gaspar comentó que era una buena idea dibujar la locomotora. Julián asintió y ambos se quedaron callados, disfrutando del momento. Al final, Gaspar se acostó tranquilo y Julián se fue a dormir. En casa te queremos mucho."
+            }
+          },
+          {
+            "scenario_id": "cuento_3_sombrero_papel",
+            "title": "El sombrero de papel junto al columpio",
+            "everyday_value": "distinguir cuándo una broma deja de ser divertida y pedir ayuda con calma",
+            "base_unaligned": {
+              "passed": false,
+              "word_count": 238,
+              "sentence_count": 29,
+              "avg_words_per_sentence": 8.21,
+              "szigriszt_pazos_inflesz": 84.76,
+              "fernandez_huerta": 88.81,
+              "chilean_markers_found": [],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [
+                "formato_multiparrafo (18 bloques)",
+                "ordenes_2a_persona_carol_gray",
+                "falta_frase_cierre_calma"
+              ],
+              "excerpt": "**Título: Emilia y Diego en el Parque**\n\nUn día soleado, Emilia y Diego se encontraron en el parque, donde estaban jugando a esconderse. Emilia llevaba un sombrero de papel muy bonito, que le había hecho su abuela. Era muy cariñoso y se veía muy bien con su pe..."
+            },
+            "roanso_qlora_human_scale": {
+              "passed": true,
+              "word_count": 159,
+              "sentence_count": 9,
+              "avg_words_per_sentence": 17.67,
+              "szigriszt_pazos_inflesz": 73.19,
+              "fernandez_huerta": 77.12,
+              "chilean_markers_found": [
+                "banca",
+                "tranquila"
+              ],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [],
+              "turns_used": 1,
+              "story_text": "Emilia y Diego estaban jugando a los navegantes en la plaza del barrio, donde los columpios de madera resonaban con el viento. Con sus sombreros de papel, imitaban a los marineros, lanzándose a la arena como si estuvieran en el mar. De repente, el viento arrancó el sombrero de Emilia y lo empujó lejos, mientras el de Diego quedó colgado del árbol, ondeando con gracia. Emilia no se reía más, aunque Diego seguía riendo, como si no hubiera pasado nada. Se acercó a la banca, donde estaba sentada la mamá, y le dijo con voz tranquila: \"Papá, me duele un poco en el pecho\". La mamá le miró con atención, pero Emilia no se puso a llorar ni se quejó. Diego, al ver que Emilia no se reía, se sintió culpable, devolvió el sombrero con cuidado y juntos armaron una flota. Esa noche, Emilia durmió en calma, sabiendo que su madre la había escuchado. En casa te queremos mucho."
+            }
+          },
+          {
+            "scenario_id": "cuento_4_carpa_lluvia",
+            "title": "La carpa de frazadas en tarde de lluvia",
+            "everyday_value": "adaptarse paso a paso cuando un panorama cambia por la lluvia",
+            "base_unaligned": {
+              "passed": false,
+              "word_count": 243,
+              "sentence_count": 35,
+              "avg_words_per_sentence": 6.94,
+              "szigriszt_pazos_inflesz": 88.37,
+              "fernandez_huerta": 92.35,
+              "chilean_markers_found": [],
+              "non_chilean_dubbing_found": [
+                "autobús"
+              ],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [
+                "formato_multiparrafo (12 bloques)",
+                "lexico_no_chileno:autobús",
+                "falta_frase_cierre_calma"
+              ],
+              "excerpt": "**Título: \"El Niño que Esperaba a la Lluvia\"**\n\nEn un pueblo pequeño, donde las calles eran anchas y los árboles eran altos, vivía un pequeño chico llamado Lucas. Lucas tenía una gran pasión por el parque. Cada día, después de comer, se subía al autobús escola..."
+            },
+            "roanso_qlora_human_scale": {
+              "passed": true,
+              "word_count": 176,
+              "sentence_count": 13,
+              "avg_words_per_sentence": 13.54,
+              "szigriszt_pazos_inflesz": 68.7,
+              "fernandez_huerta": 73.03,
+              "chilean_markers_found": [
+                "frazada",
+                "once",
+                "tibia",
+                "tranquilo",
+                "vereda"
+              ],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [],
+              "turns_used": 1,
+              "story_text": "Tomás tenía las zapatillas listas junto a la puerta, dispuestas para girar su remolino nuevo en el parque. Pero al acercarse a la vereda, vio caer gotas gruesas sobre el suelo brillante. Se sintió triste porque había cambiado el plan. Su papá, sentado junto a la ventana, lo notó y se agachó a su altura, señalando con el dedo. Le dijo que primero armarían una carpa tibia con dos sillas y una frazada grande, luego girarían el remolino soplando suave y finalmente tomarían once calentita. Tomás asintió, y los hombros se relajaron. Al anochecer, se acostó en la frazada, sintiendo el calor del sol. Aunque la lluvia había llegado, ahora todo parecía más cómodo. La carpa protegía de la lluvia, las sillas lo mantuvieron erguido, y la once calentita era un refugio. En la noche, mientras tomaba el café, pensaba en cómo papá siempre sabía qué hacer. Aunque la lluvia había cambiado el plan, ahora todo parecía más tranquilo. La vida seguía, y aunque hubiera un cambio, siempre había una solución. En casa te queremos mucho."
+            }
+          },
+          {
+            "scenario_id": "cuento_5_barquitos_estero",
+            "title": "La carrera de barquitos en el estero",
+            "everyday_value": "manejar la frustración al llegar segundo y valorar la amistad",
+            "base_unaligned": {
+              "passed": false,
+              "word_count": 274,
+              "sentence_count": 18,
+              "avg_words_per_sentence": 15.22,
+              "szigriszt_pazos_inflesz": 85.2,
+              "fernandez_huerta": 88.83,
+              "chilean_markers_found": [],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [
+                "formato_multiparrafo (13 bloques)",
+                "ordenes_2a_persona_carol_gray",
+                "falta_frase_cierre_calma"
+              ],
+              "excerpt": "**Título: Clara y el secreto de perder con buen corazón**\n\nEn un pequeño pueblo junto al mar, había un día especial cada año: la **carrera de barcos**. Todos los niños del pueblo se reunían en la playa para competir en una carrera emocionante, donde los barcos..."
+            },
+            "roanso_qlora_human_scale": {
+              "passed": true,
+              "word_count": 206,
+              "sentence_count": 14,
+              "avg_words_per_sentence": 14.71,
+              "szigriszt_pazos_inflesz": 73.57,
+              "fernandez_huerta": 77.66,
+              "chilean_markers_found": [
+                "estero",
+                "tranquila"
+              ],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [],
+              "turns_used": 1,
+              "story_text": "Clara y Benjamín se sentaron bajo los sauces junto a la orilla baja del estero, donde el sol se reflejaba en las aguas tranquilas. El aire era fresco y llevaba el olor a tierra mojada. Clara y Benjamín habían decidido jugar con los barquitos de corteza de pino, una actividad que les encantaba porque les recordaba los días de niños. Mientras se acercaban a la piedra blanca, Clara notó que una ramita se le escapaba de la mano y se metía en el agua. El barquito de Clara se movía hacia la piedra, pero la corriente lo empujaba hacia la orilla. Benjamín, sin darse cuenta, había llegado antes. Clara sintió un nudo en el estómago. No quería decirle a Benjamín que no valía, pero lo hacía. Sin embargo, Benjamín se acercó y le dijo que no se preocupara, que él lo ayudaría. Juntos recogieron los barquitos y los llevaron a la orilla. Aunque el barquito de Clara no llegó primero, Benjamín le mostró dónde la corriente era más clara. Luego, navegaron juntos de nuevo al atardecer, disfrutando del silencio y la calma. Más tarde, Clara se acostó en su cama y se durmió tranquila, sabiendo que estaba en casa con Benjamín. En casa te queremos mucho."
+            }
+          }
+        ]
+      },
+      "elapsed_seconds": 600.81
+    },
+    "qwen2_5_7b_instruct": {
+      "base_model": "Qwen/Qwen2.5-7B-Instruct",
+      "license": "Apache-2.0",
+      "params_billions": 7.6,
+      "gpu_device": "cuda:1 (Tesla T4)",
+      "vram_peak_allocated_mib": 6776.9,
+      "adapter_safetensors_bytes": 161533192,
+      "adapter_safetensors_sha256": "6cd46fd04282218e09ff1169f69df7fa0d225b93a7a0a4ba49103002a66df92d",
+      "held_out_validation": {
+        "val_examples": 50,
+        "base_val_loss": 2.5853,
+        "lora_val_loss": 2.3639,
+        "base_perplexity": 13.27,
+        "lora_perplexity": 10.63,
+        "perplexity_reduction_percent": 19.89
+      },
+      "universal_design_5_scenarios": {
+        "scenarios_count": 5,
+        "base_unaligned_passes": 0,
+        "base_unaligned_pass_rate_pct": 0.0,
+        "roanso_qlora_passes": 3,
+        "roanso_qlora_pass_rate_pct": 60.0,
+        "mean_roanso_inflesz": 68.03,
+        "total_10gram_collisions": 0,
+        "results": [
+          {
+            "scenario_id": "cuento_1_puente_recreo",
+            "title": "El puente de bloques en el recreo",
+            "everyday_value": "diferenciar un accidente por entusiasmo de una mala intención",
+            "base_unaligned": {
+              "passed": false,
+              "word_count": 222,
+              "sentence_count": 23,
+              "avg_words_per_sentence": 9.65,
+              "szigriszt_pazos_inflesz": 65.01,
+              "fernandez_huerta": 69.7,
+              "chilean_markers_found": [],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [
+                "formato_multiparrafo (9 bloques)",
+                "falta_frase_cierre_calma"
+              ],
+              "excerpt": "### El Puente de Bloques: Una Lección de Amistad\n\nEn un hermoso día de primavera, en la escuela del señorito García, dos pequeños amigos llamados Sofía y Martín compartían su amor por las construcciones con bloques de madera. Sofía era una niña con el espíritu..."
+            },
+            "roanso_qlora_human_scale": {
+              "passed": false,
+              "word_count": 97,
+              "sentence_count": 5,
+              "avg_words_per_sentence": 19.4,
+              "szigriszt_pazos_inflesz": 67.97,
+              "fernandez_huerta": 72.0,
+              "chilean_markers_found": [
+                "banca",
+                "frazada"
+              ],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [
+                "largo_fuera_rango (97 palabras)",
+                "falta_frase_cierre_calma"
+              ],
+              "turns_used": 4,
+              "story_text": "Sofía se sentó a la orilla de la banca y comenzó a armar un puente con bloques de madera. Martín pasó corriendo tras una pelota y rozó la esquina de la banca, haciendo caer los bloques. Sofía sintió que sus mejillas se ponían tibias y miró a Martín, que tenía los ojos abiertos de susto y dejaba la pelota para agacharse a recoger los bloques con ella. Se dieron cuenta de que no había sido intencionado y lo reconstruyeron juntos. Aquella noche Sofía descansó bajo su frazada suave, feliz de tener un amigo tan generoso como Martín."
+            }
+          },
+          {
+            "scenario_id": "cuento_2_locomotora_azul",
+            "title": "Cinco minutos más con la locomotora azul",
+            "everyday_value": "poner un límite amable sin enojarse ni sentirse culpable",
+            "base_unaligned": {
+              "passed": false,
+              "word_count": 236,
+              "sentence_count": 19,
+              "avg_words_per_sentence": 12.42,
+              "szigriszt_pazos_inflesz": 73.51,
+              "fernandez_huerta": 77.73,
+              "chilean_markers_found": [
+                "tranquilo"
+              ],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [
+                "formato_multiparrafo (6 bloques)",
+                "falta_frase_cierre_calma"
+              ],
+              "excerpt": "En un hermoso pueblo llamado Pintura, donde todos los días se pintaban sonrisas y risas, vivían dos hermanos gemelos: Gaspar y Julián. Eran muy parecidos en apariencia, pero sus personalidades eran como opuestos polares. Gaspar era tranquilo y amable, mientras..."
+            },
+            "roanso_qlora_human_scale": {
+              "passed": true,
+              "word_count": 162,
+              "sentence_count": 10,
+              "avg_words_per_sentence": 16.2,
+              "szigriszt_pazos_inflesz": 74.88,
+              "fernandez_huerta": 78.83,
+              "chilean_markers_found": [
+                "once",
+                "tibio"
+              ],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [],
+              "turns_used": 4,
+              "story_text": "Gaspar estaba sentado en la alfombra de la sala dibujando una locomotora azul del sur y le faltaba solo la última rueda. De repente, su primo Julián se acercó a él y estiró la mano para pedirle el lápiz azul oscuro para pintar el mar. Julián tenía los hombros apretados y los ojos brillantes de ansiedad. Gaspar notó que su primo tenía prisa y se dio cuenta de que no quería perder tiempo. Sin embargo, Gaspar no quería compartir sus lápices con Julián y no quería que nadie se llevara su dibujo. Así que, sin esconder sus lápices ni gritar, explicó con voz clara y amable que terminaría esa rueda contando hasta veinte y le ofreció mientras tanto el lápiz celeste claro para las olas. Julián aceptó gustoso y Gaspar siguió con su trabajo. Pasaron once y llegaron a la hora de comer. Gaspar tomó el pan tibio y se sentó en la mesa a comer tranquilamente. En casa te queremos mucho."
+            }
+          },
+          {
+            "scenario_id": "cuento_3_sombrero_papel",
+            "title": "El sombrero de papel junto al columpio",
+            "everyday_value": "distinguir cuándo una broma deja de ser divertida y pedir ayuda con calma",
+            "base_unaligned": {
+              "passed": false,
+              "word_count": 239,
+              "sentence_count": 24,
+              "avg_words_per_sentence": 9.96,
+              "szigriszt_pazos_inflesz": 73.06,
+              "fernandez_huerta": 77.44,
+              "chilean_markers_found": [],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [
+                "formato_multiparrafo (10 bloques)",
+                "falta_frase_cierre_calma"
+              ],
+              "excerpt": "Claro, aquí tienes una pequeña historia infantil sobre Emilia y Diego en el parque:\n\n---\n\n**Emilia y Diego en el Parque**\n\nUna tarde soleada, Emilia y Diego se dirigían al parque para pasar un rato divertido. El sol brillaba y el aire estaba fresco. Mientras c..."
+            },
+            "roanso_qlora_human_scale": {
+              "passed": false,
+              "word_count": 95,
+              "sentence_count": 3,
+              "avg_words_per_sentence": 31.67,
+              "szigriszt_pazos_inflesz": 57.13,
+              "fernandez_huerta": 60.86,
+              "chilean_markers_found": [
+                "banca",
+                "tranquila"
+              ],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [
+                "largo_fuera_rango (95 palabras)",
+                "falta_frase_cierre_calma"
+              ],
+              "turns_used": 4,
+              "story_text": "En la plaza del barrio junto a los columpios de madera, Emilia y Diego doblan sombreros de papel para jugar a los navegantes. El viento vuela el sombrero de Emilia y Diego lo levanta alto haciendo voces graciosas sin notar que Emilia ya dejó de reírse y siente calor incómodo en el pecho. Emilia expresa primero su límite con voz tranquila y luego pide apoyo sereno a la mamá en la banca; Diego comprende que se pasó de entusiasmo, devuelve el sombrero con cuidado, arman una flota juntos y esa noche Emilia duerme en calma."
+            }
+          },
+          {
+            "scenario_id": "cuento_4_carpa_lluvia",
+            "title": "La carpa de frazadas en tarde de lluvia",
+            "everyday_value": "adaptarse paso a paso cuando un panorama cambia por la lluvia",
+            "base_unaligned": {
+              "passed": false,
+              "word_count": 250,
+              "sentence_count": 23,
+              "avg_words_per_sentence": 10.87,
+              "szigriszt_pazos_inflesz": 77.1,
+              "fernandez_huerta": 81.27,
+              "chilean_markers_found": [
+                "tranquila"
+              ],
+              "non_chilean_dubbing_found": [
+                "autobús"
+              ],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [
+                "formato_multiparrafo (9 bloques)",
+                "lexico_no_chileno:autobús",
+                "falta_frase_cierre_calma"
+              ],
+              "excerpt": "### El día especial de los patitos: Un viaje de paciencia\n\nEn un pequeño pueblo llamado Silencio, vivía un patito llamado Pipi. Pipi era un patito muy curioso y activo, pero tenía un problema especial: le encantaba estar al aire libre, pero el ruido y la sensa..."
+            },
+            "roanso_qlora_human_scale": {
+              "passed": true,
+              "word_count": 204,
+              "sentence_count": 10,
+              "avg_words_per_sentence": 20.4,
+              "szigriszt_pazos_inflesz": 63.36,
+              "fernandez_huerta": 67.5,
+              "chilean_markers_found": [
+                "frazada",
+                "once",
+                "patio",
+                "tibia",
+                "vereda"
+              ],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [],
+              "turns_used": 1,
+              "story_text": "Tomás estaba muy entusiasmado porque ese día iría al parque a girar su remolino nuevo. Estaba tan contento que hasta había puesto las zapatillas en la puerta, para poder salir corriendo al aire libre. Pero de repente empezaron a caer gotas gruesas sobre la vereda brillante, y eso hizo que se sintiera triste porque no podía salir a girar el remolino como tenía planeado. Tomás se sentó en el borde de la ventana y miró hacia afuera. Entonces papá se agachó a su altura y le dijo que primero armarían una carpa tibia con dos sillas y una frazada grande; después girarían el remolino soplando suave; y finalmente tomarían un once calentito. Tomás se sentó en silencio mientras papá le explicaba la nueva rutina de la tarde. Cuando terminó de hablar, Tomás se levantó y se fue directo a la cocina para ayudar a preparar el once. Al cabo de un rato, ya estaban todos reunidos en el patio bajo la carpa tibia y comiendo el once caliente. Tomás se sentía muy feliz porque aunque no había podido salir a girar el remolino como esperaba, había encontrado una forma de disfrutar de una tarde divertida con toda la familia. En casa te queremos mucho."
+            }
+          },
+          {
+            "scenario_id": "cuento_5_barquitos_estero",
+            "title": "La carrera de barquitos en el estero",
+            "everyday_value": "manejar la frustración al llegar segundo y valorar la amistad",
+            "base_unaligned": {
+              "passed": false,
+              "word_count": 257,
+              "sentence_count": 24,
+              "avg_words_per_sentence": 10.71,
+              "szigriszt_pazos_inflesz": 66.68,
+              "fernandez_huerta": 71.25,
+              "chilean_markers_found": [],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [
+                "formato_multiparrafo (8 bloques)",
+                "falta_frase_cierre_calma"
+              ],
+              "excerpt": "Clara y Benjamín: La Carrera de Barcos\n\nHabía una vez en un pequeño pueblo costero llamado Marina, donde vivían dos amigos muy especiales, Clara y Benjamín. Ambos amaban el mar y disfrutaban construyendo barcos con sus propias manos. Un día, decidieron tener u..."
+            },
+            "roanso_qlora_human_scale": {
+              "passed": true,
+              "word_count": 204,
+              "sentence_count": 16,
+              "avg_words_per_sentence": 12.75,
+              "szigriszt_pazos_inflesz": 76.81,
+              "fernandez_huerta": 80.89,
+              "chilean_markers_found": [
+                "banca",
+                "estero",
+                "patio"
+              ],
+              "non_chilean_dubbing_found": [],
+              "clinical_terms_found": [],
+              "corpus_10gram_collisions": 0,
+              "errors": [],
+              "turns_used": 2,
+              "story_text": "Clara estaba triste porque había perdido la carrera de natación. Se sentaba en la banca del patio y lloraba. Benjamín la consolaba diciéndole que era una buena nadadora y que nadie ganaba siempre. Un día, Clara y Benjamín se encontraron junto a los sauces bajo la orilla baja del estero y decidieron lanzar dos barquitos de corteza de pino hasta la piedra blanca. Clara soltó el suyo y sintió que la corriente lo empujaba hacia atrás. Benjamín le gritó que no se preocupara y que lo agarrara bien. Clara agarró el barco de Benjamín y lo soltó. Al ver que el barco de Clara se detenía en una ramita, Benjamín le dijo que era muy bonito. Clara le agradeció y se sentó en la banca. Benjamín le contó que su padre le había dicho que si se esforzaba, algún día ganaría una carrera. Clara se sintió mejor y decidió seguir practicando. Benjamín le prometió que la ayudaría. Al atardecer, Clara y Benjamín volvieron a lanzar sus barcos al estero. Benjamín se quedó esperándola y cuando llegó, le entregó su barco y le preguntó si se sentía mejor. Clara le contestó que sí y se acostó feliz en su cama. En casa te queremos mucho."
+            }
+          }
+        ]
+      },
+      "elapsed_seconds": 817.31
+    }
+  },
+  "total_elapsed_seconds": 1461.17
+}

@@ -18,9 +18,11 @@ from roanso_platform.corpus_pipeline import LEDGER_COLUMNS_V1, sha256_bytes
 from training.kaggle_orchestrator import (
     assert_safe_roanso_slug,
     load_kaggle_credentials,
+    stage_benchmark_kaggle_bundle,
     stage_slm_kaggle_bundle,
     stage_tts_kaggle_bundle,
 )
+from training.kaggle_benchmark_kernel import evaluate_story_gates
 from training.kaggle_qlora_kernel import (
     compute_kaggle_gpu_profile,
     run_kaggle_qlora_pipeline,
@@ -105,15 +107,16 @@ def test_02_kgat_bearer_credentials_bridge_cleanly(tmp_path: Path, monkeypatch: 
     monkeypatch.delenv("KAGGLE_API_TOKEN", raising=False)
     monkeypatch.delenv("KAGGLE_KEY", raising=False)
 
+    dummy_kgat = "KGAT_" + ("0" * 32)
     fake_json = tmp_path / "kaggle.json"
     fake_json.write_text(
-        json.dumps({"username": "demo_roanso_org", "key": "KGAT_00000000000000000000000000000000"}),
+        json.dumps({"username": "demo_roanso_org", "key": dummy_kgat}),
         encoding="utf-8",
     )
     creds = load_kaggle_credentials(kaggle_json_path=fake_json)
     assert creds.username == "demo_roanso_org"
     assert creds.is_bearer_kgat is True
-    assert os.environ.get("KAGGLE_API_TOKEN") == "KGAT_00000000000000000000000000000000"
+    assert os.environ.get("KAGGLE_API_TOKEN") == dummy_kgat
 
 
 def test_03_stage_slm_bundle_and_t4_x2_preflight(tmp_path: Path) -> None:
@@ -230,3 +233,46 @@ def test_04_private_voice_actor_kernel_enforces_adult_commercial_contract(tmp_pa
     )
     assert report["acoustic_audit"]["studio_ready_for_commercial_lora"] is True
     assert report["backbone_license"] == "Apache-2.0"
+
+
+def test_05_stage_dual_t4_benchmark_and_gates_evaluator(tmp_path: Path) -> None:
+    bench_staged = stage_benchmark_kaggle_bundle(
+        staging_root=tmp_path / "staging_bench",
+        kaggle_username="roanso_lab",
+    )
+    kn_meta = json.loads((Path(bench_staged["kernel_dir"]) / "kernel-metadata.json").read_text(encoding="utf-8"))
+    assert kn_meta["is_private"] is True
+    assert kn_meta["enable_gpu"] is True
+    assert kn_meta["enable_internet"] is False
+    assert len(kn_meta["model_sources"]) == 2
+    assert kn_meta["kernel_sources"] == [
+        "roanso_lab/roanso-qlora-qwen3-4b-chileno-v1",
+        "roanso_lab/roanso-qlora-qwen2-5-7b-chileno-v1",
+    ]
+
+    bad_story = (
+        "En el autobús escolar Tomás tenía un diagnóstico sensorial y tú debes aprender "
+        "una valiosa lección para portarte bien."
+    )
+    bad_eval = evaluate_story_gates(bad_story, set(), enforce_closing=True)
+    assert bad_eval["passed"] is False
+    assert any("etiquetas_clinicas_ley21719" in e for e in bad_eval["errors"])
+    assert "ordenes_2a_persona_carol_gray" in bad_eval["errors"]
+    assert "moraleja_sermon_ia" in bad_eval["errors"]
+    assert any("lexico_no_chileno" in e for e in bad_eval["errors"])
+
+    good_story = (
+        "Sofía armaba con calma un puente de madera sobre la banca del patio cuando Martín pasó corriendo "
+        "por la vereda y rozó sin querer la esquina. Sofía sintió las mejillas tibias, pero al mirar a Martín "
+        "vio que él dejó ir la pelota enseguida y se agachó con cuidado a recoger cada bloque junto a ella. "
+        "Al notar que había sido un accidente sin mala intención, conversaron tranquilos y levantaron juntos "
+        "un puente firme con bloques dobles antes de volver a la sala. Más tarde tomaron once tibia en la "
+        "cocina mirando el estero iluminado por el atardecer. Esa noche Sofía se arropó con su frazada suave "
+        "escuchando el silencio sereno del hogar porque en casa te queremos mucho."
+    )
+    good_eval = evaluate_story_gates(good_story, set(), enforce_closing=True)
+    assert good_eval["passed"] is False  # < 140 palabras se marca
+    good_story_long = good_story[:-1] + ", sintiendo la brisa fresca del jardín tranquilo mientras descansaba despacito porque en casa te queremos mucho."
+    good_eval_2 = evaluate_story_gates(" ".join([good_story[:-29], "Caminaron despacito por el patio recordando sus juegos tranquilos.", good_story_long]), set(), enforce_closing=True)
+    assert good_eval_2["passed"] is True
+    assert good_eval_2["szigriszt_pazos_inflesz"] >= 55.0

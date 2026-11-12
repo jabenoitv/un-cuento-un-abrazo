@@ -1,0 +1,81 @@
+{
+  "status": "OK",
+  "gpu_device": "Local NVIDIA CUDA (8GB Sequential Staged)",
+  "slm_stage": {
+    "base_model": "Qwen/Qwen3-4B",
+    "lora_adapter_dir": "platform/checkpoints/kaggle_pulled/qwen3_4b/roanso-chileno-lora-v1",
+    "lora_safetensors_sha256": "cc8eb21f28cb2a749d95e3106e712b2bc8df2b80d38618cd0c0c6fbe5fc9350c",
+    "vram_free_before_mib": 7032,
+    "vram_free_during_slm_mib": 4164,
+    "vram_free_after_evict_mib": 4520,
+    "slm_vram_footprint_mib": 2868,
+    "text_elapsed_seconds": 117.98,
+    "self_healing_turns_used": 1
+  },
+  "linguistic_qa": {
+    "valido": true,
+    "errores": [],
+    "advertencias": [],
+    "perfil_sensorial": {
+      "lenguaje": "literal_claro",
+      "estructura": "enganche_rampa_calma",
+      "estimulo_sonoro": "dinamico_a_calmo",
+      "foco_tematico": "rotacion_multiverso"
+    },
+    "legibilidad": {
+      "palabras": 199,
+      "oraciones": 20,
+      "palabras_por_oracion": 9.9,
+      "p90_palabras_oracion": 16,
+      "silabas_por_palabra": 1.91,
+      "fernandez_huerta": 82.1,
+      "szigriszt_pazos": 77.9,
+      "gutierrez_polini": 47.6,
+      "nivel_lectura": "Muy fácil (4-7 años / Lectura Fácil)"
+    }
+  },
+  "audio_stage": {
+    "duration_seconds": 83.61,
+    "words_per_minute": 142.8,
+    "overall_rms_dbfs": -25.4,
+    "opening_quarter_rms_dbfs": -24.89,
+    "closing_quarter_rms_dbfs": -25.89,
+    "sleep_ramp_attenuation_db": 1.0,
+    "spectral_centroid_hz": 2380.9,
+    "voice_id": "catalog-chilena-calida-f1",
+    "estimulo_sonoro": "dinamico_a_calmo",
+    "blocks_count": 6,
+    "block_repairs_triggered": 0,
+    "whisper_wer": 0.0201,
+    "whisper_similarity": 0.9849,
+    "mismatched_spans": [],
+    "voice_display_name": "Narradora Valle Central Cálida (Catálogo Ético es-CL)",
+    "mp3_path": "platform/live_smoke_data/demo_qwen3_4b_lora_chileno.mp3",
+    "mp3_size_bytes": 1338669,
+    "mp3_sha256": "792babd58512c78ea9830660ad4a3f97f50d0704911ed68cdc950f93401244b9",
+    "audio_elapsed_seconds": 119.27
+  },
+  "breakfast_conversation_card": {
+    "fundamento": "Para conversar mañana en el desayuno (2 minutos en familia, sin tono moralista).",
+    "valor_del_capitulo": "entender las verdaderas intenciones de los amigos",
+    "preguntas": [
+      {
+        "tipo": "1. Emoción en el momento",
+        "pregunta": "¿Qué sintió Tomás cuando ocurrió el momento principal del cuento de anoche?",
+        "pista_apoyo": "Escuchar con calma qué emoción notó y qué la provocó en la historia."
+      },
+      {
+        "tipo": "2. Leer las intenciones",
+        "pregunta": "¿Cómo nos dimos cuenta de las verdaderas intenciones de los demás personajes?",
+        "pista_apoyo": "Fijarse en sus gestos y palabras para distinguir un descuido o entusiasmo de una mala intención."
+      },
+      {
+        "tipo": "3. En el colegio con amigos",
+        "pregunta": "¿Qué harías tú si un amigo hace eso en el colegio?",
+        "pista_apoyo": "Imaginar juntos una respuesta tranquila para poner límites amables o ponerse de acuerdo."
+      }
+    ],
+    "escalera_apoyo": "Sin presión: si prefiere solo escuchar, comparte tú primero qué parte te gustó en una frase breve."
+  },
+  "story_text": "Tomás tenía diez años y vivía con su papá en una casa grande en San José. Su mejor amigo era Diego, un chico de once años que siempre lo llevaba a jugar al parque. Hoy, mientras caminaban por la vereda del patio, Tomás notó que Diego se había quedado atrás. \"¿Por qué te detuviste?\" preguntó Tomás. Diego sonrió y dijo que quería mostrarle algo interesante. Tomás se acercó a él y vio que Diego estaba jugando con unos bloques. \"Estos son los materiales para construir\", explicó Diego. Tomás se acercó y vio que Diego había construido un puente. \"Es muy bonito\", dijo Tomás. Diego sonrió y dijo que quería que Tomás lo ayudara a construir otro puente. Tomás aceptó y juntos comenzaron a construir el puente. Mientras trabajaban, Tomás notó que Diego se estaba divirtiendo mucho. \"Esto es divertido\", dijo Diego. Tomás sonrió y dijo que sí, era divertido. Diego siguió trabajando y Tomás lo ayudaba. Al final, cuando terminaron, Diego dijo que era un puente muy bonito. Tomás sonrió y dijo que sí, era muy bonito. Mientras caminaban hacia la casa, Tomás pensó en lo divertido que había sido. Ahora descansa tranquilo, que mañana será un lindo día."
+}
